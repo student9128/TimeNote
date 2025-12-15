@@ -4,6 +4,8 @@ import com.kevin.timenote.domain.model.CountdownModel
 import com.kevin.timenote.domain.repository.CountdownRepository
 import javax.inject.Inject
 
+//这里可以使用@Inject constructor 于 UseCaseModule.kt两个两者取其一就可，
+// 目的是告诉 Hilt CountdownUseCase需要一个CountdownRepository
 class CountdownUseCase @Inject constructor(
     private val repository: CountdownRepository
 ) {

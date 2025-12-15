@@ -7,8 +7,10 @@ import com.kevin.timenote.domain.model.CountdownModel
 import com.kevin.timenote.domain.repository.CountdownRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class CountdownRepositoryImpl(private val dao: CountdownDao) : CountdownRepository {
+class CountdownRepositoryImpl @Inject constructor(private val dao: CountdownDao) :
+    CountdownRepository {
 
     override suspend fun addCountdown(event: CountdownModel) {
         dao.insert(event.toEntity())

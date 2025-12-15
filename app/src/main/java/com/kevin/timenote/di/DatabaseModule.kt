@@ -2,6 +2,7 @@ package com.kevin.timenote.di
 
 import android.content.Context
 import androidx.room.Room
+import com.kevin.timenote.data.local.CountdownDatabase
 import com.kevin.timenote.data.local.dao.CountdownDao
 import dagger.Module
 import dagger.Provides

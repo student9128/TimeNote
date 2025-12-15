@@ -7,19 +7,30 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 import com.kevin.timenote.ui.main.MainScreen
+import com.kevin.timenote.ui.navigation.AppNavGraph
+import com.kevin.timenote.ui.navigation.Route
 import com.kevin.timenote.ui.theme.TimeNoteTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,12 +38,27 @@ class MainActivity : ComponentActivity() {
         setContent {
             TimeNoteTheme {
                 val navController = rememberNavController()
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-//                    Greeting(
-//                        name = "Android",
-//                        modifier = Modifier.padding(innerPadding)
-//                    )
-                    MainScreen(navController, modifier = Modifier.padding(innerPadding))
+                Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+                    BottomAppBar() {
+                        Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxWidth()) {
+                            Text("Home", modifier = Modifier.clickable() {
+                                navController.navigate("Home")
+                            })
+                            Text("Mine", modifier = Modifier.clickable() {
+                                navController.navigate("Mine")
+                            })
+                        }
+                    }
+                }) { innerPadding ->
+                    AppNavGraph(
+                        navController,
+                        modifier = Modifier.padding(
+                            start = innerPadding.calculateLeftPadding(LayoutDirection.Ltr),
+                            top = 0.dp,
+                            end = innerPadding.calculateLeftPadding(LayoutDirection.Ltr),
+                            bottom = innerPadding.calculateBottomPadding()
+                        )
+                    )
                 }
             }
         }

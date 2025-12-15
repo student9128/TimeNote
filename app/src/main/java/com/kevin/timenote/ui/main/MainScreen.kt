@@ -18,7 +18,7 @@ import com.kevin.timenote.ui.home.HomeScreen
 import com.kevin.timenote.ui.mine.MineScreen
 
 @Composable
-fun MainScreen(navController: NavController,modifier: Modifier) {
+fun MainScreen(navController: NavController, modifier: Modifier = Modifier) {
     var selectedTab by remember { mutableStateOf(0) }
 
     Column {
@@ -29,7 +29,7 @@ fun MainScreen(navController: NavController,modifier: Modifier) {
 
         when (selectedTab) {
             0 -> HomeScreen(navController)
-            1 -> MineScreen()
+            1 -> MineScreen(navController)
         }
     }
 }

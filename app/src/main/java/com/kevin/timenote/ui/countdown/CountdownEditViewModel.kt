@@ -1,5 +1,6 @@
 package com.kevin.timenote.ui.countdown
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -11,6 +12,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import androidx.compose.runtime.State
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 @HiltViewModel
 class CountdownEditViewModel @Inject constructor(
@@ -18,12 +22,13 @@ class CountdownEditViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _uiState = mutableStateOf(CountdownEditUiState())
-    val uiState: State<CountdownEditUiState> = _uiState
+    private val _uiState = MutableStateFlow(CountdownEditUiState())
+    val uiState: StateFlow<CountdownEditUiState> = _uiState.asStateFlow()
 
     init {
         savedStateHandle.get<String>("model")?.let {
             val model = Gson().fromJson(it, CountdownModel::class.java)
+            Log.d("Count","title=${model.title}")
             _uiState.value = CountdownEditUiState(
                 id = model.id,
                 title = model.title,

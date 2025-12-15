@@ -8,6 +8,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -19,8 +20,7 @@ fun CountdownScreen(
     navController: NavController,
     viewModel: CountdownEditViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState
-
+    val state by viewModel.uiState.collectAsState()
     Column(modifier = Modifier.padding(16.dp)) {
         TextField(
             value = state.title,
