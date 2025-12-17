@@ -18,6 +18,7 @@ import com.google.gson.Gson
 import com.kevin.timenote.ui.countdown.CountdownItem
 import com.kevin.timenote.ui.navigation.Route
 import com.kevin.timenote.ui.widget.AppBar
+import com.nlf.calendar.Solar
 
 @Composable
 fun HomeScreen(
@@ -29,6 +30,7 @@ fun HomeScreen(
     Scaffold(topBar = { AppBar(title = "Home", showBackIcon = false) }) { innerPadding ->
 
         Column(modifier = Modifier.padding(innerPadding)) {
+            Text("${Solar.fromYmd(2025,12,17).lunar.toString()}")
             Button(
                 onClick = {
                     navController.navigate(Route.Countdown.route)

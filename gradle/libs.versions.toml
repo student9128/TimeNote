@@ -19,6 +19,7 @@ navigationCompose = "2.9.6"
 hiltNavigationCompose = "1.1.0-alpha01"
 ksp="2.0.21-1.0.27"
 hiltAndroid ="2.57.1"
+lunarCalendar="1.7.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -44,6 +45,7 @@ androidx-room-paging = { group = "androidx.room", name = "room-paging", version.
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntime" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+lunar={group="cn.6tail",name="lunar",version.ref="lunarCalendar"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
