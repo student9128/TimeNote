@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.devtoolsKsp)
     alias(libs.plugins.hilt)
+    alias(libs.plugins.kotlin.serialization)
 //    id("com.google.devtools.ksp")
 //    id("com.google.dagger.hilt.android")
 }
@@ -38,6 +39,11 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+//    kotlin {
+//        compilerOptions{
+//            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+//        }
+//    }
     buildFeatures {
         compose = true
     }
@@ -68,6 +74,7 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.57.1")
     ksp("com.google.dagger:hilt-android-compiler:2.57.1")
     implementation("com.google.code.gson:gson:2.13.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.2")
     implementation(libs.lunar)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

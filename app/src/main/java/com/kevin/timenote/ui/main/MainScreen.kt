@@ -28,8 +28,8 @@ fun MainScreen(navController: NavController, modifier: Modifier = Modifier) {
         }
 
         when (selectedTab) {
-            0 -> HomeScreen(navController)
-            1 -> MineScreen(navController)
+            0 -> HomeScreen()
+            1 -> MineScreen()
         }
     }
 }
