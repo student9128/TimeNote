@@ -6,12 +6,12 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
 
-sealed class Route(val route: String) {
-    object Main : Route("main")
-    object Home : Route("home")
-    object Mine : Route("mine")
-    object Countdown : Route("countdown")
-}
+//sealed class Route(val route: String) {
+//    object Main : Route("main")
+//    object Home : Route("home")
+//    object Mine : Route("mine")
+//    object Countdown : Route("countdown")
+//}
 
 @Serializable
 object Home

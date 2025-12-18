@@ -48,5 +48,6 @@ fun AppNavHost(
                 }
             }
         }
+        composable<Countdown> { CountdownScreen() }
     }
 }
