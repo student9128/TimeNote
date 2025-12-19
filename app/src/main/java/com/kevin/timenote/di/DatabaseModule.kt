@@ -2,8 +2,9 @@ package com.kevin.timenote.di
 
 import android.content.Context
 import androidx.room.Room
-import com.kevin.timenote.data.local.CountdownDatabase
+import com.kevin.timenote.data.local.TimeAppDatabase
 import com.kevin.timenote.data.local.dao.CountdownDao
+import com.kevin.timenote.data.local.dao.EventTypeDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,14 +20,19 @@ object DatabaseModule {
     @Singleton
     fun provideDatabase(
         @ApplicationContext context: Context
-    ): CountdownDatabase =
+    ): TimeAppDatabase =
         Room.databaseBuilder(
             context,
-            CountdownDatabase::class.java,
+            TimeAppDatabase::class.java,
             "countdown.db"
         ).build()
 
     @Provides
-    fun provideDao(db: CountdownDatabase): CountdownDao =
+    fun provideDao(db: TimeAppDatabase): CountdownDao =
         db.countdownDao()
+
+    @Provides
+    fun provideEventTypeDao(database: TimeAppDatabase): EventTypeDao {
+        return database.eventTypeDao() // The name of the abstract function in your AppDatabase class
+    }
 }

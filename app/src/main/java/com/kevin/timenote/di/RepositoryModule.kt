@@ -2,8 +2,10 @@ package com.kevin.timenote.di
 
 import com.kevin.timenote.data.local.dao.CountdownDao
 import com.kevin.timenote.data.repository.CountdownRepositoryImpl
+import com.kevin.timenote.data.repository.EventTypeRepositoryImpl
 import com.kevin.timenote.data.repository.SettingsRepositoryImpl
 import com.kevin.timenote.domain.repository.CountdownRepository
+import com.kevin.timenote.domain.repository.EventTypeRepository
 import com.kevin.timenote.domain.repository.SettingsRepository
 import dagger.Binds
 import dagger.Module
@@ -40,5 +42,9 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindEventTypeRepository(impl: EventTypeRepositoryImpl): EventTypeRepository
 }
 

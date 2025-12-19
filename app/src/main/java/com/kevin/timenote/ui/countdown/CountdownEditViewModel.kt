@@ -1,7 +1,9 @@
 package com.kevin.timenote.ui.countdown
 
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,21 +12,30 @@ import com.kevin.timenote.domain.usecase.CountdownUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import androidx.compose.runtime.State
 import com.google.gson.Gson
+import com.kevin.timenote.domain.usecase.EventTypeUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
 class CountdownEditViewModel @Inject constructor(
-    private val useCase: CountdownUseCase,
+    private val countdownUseCase: CountdownUseCase,
+    private val eventTypeUseCase: EventTypeUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CountdownEditUiState())
     val uiState: StateFlow<CountdownEditUiState> = _uiState.asStateFlow()
-
+    val eventTypes = eventTypeUseCase.observeAllTypes()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+    var selectedType by mutableStateOf("倒数日")
     init {
         savedStateHandle.get<String>("model")?.let {
             val model = Gson().fromJson(it, CountdownModel::class.java)
@@ -42,6 +53,14 @@ class CountdownEditViewModel @Inject constructor(
 
             )
         }
+        viewModelScope.launch { eventTypeUseCase.initDefaultTypes() }
+
+    }
+
+    fun updateSelectedType(type: String) {
+        selectedType = type
+        // 如果你需要同步更新到 countdownModel State，在这里操作
+        // _state.update { it.copy(type = type) }
     }
 
     fun updateTitle(value: String) {
@@ -54,7 +73,7 @@ class CountdownEditViewModel @Inject constructor(
     fun save(onFinish: () -> Unit) {
         viewModelScope.launch {
             val s = _uiState.value
-            useCase.save(
+            countdownUseCase.save(
                 CountdownModel(
                     id = s.id,
                     title = s.title,
@@ -74,7 +93,7 @@ class CountdownEditViewModel @Inject constructor(
     fun delete(onFinish: () -> Unit) {
         viewModelScope.launch {
             val s = _uiState.value
-            useCase.delete(
+            countdownUseCase.delete(
                 CountdownModel(
                     id = s.id,
                     title = s.title,

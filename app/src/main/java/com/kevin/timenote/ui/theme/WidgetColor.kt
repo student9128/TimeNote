@@ -18,8 +18,8 @@ fun AppTextFieldColors(): TextFieldColors {
 
         // 2. 容器背景色 (Container Colors)
         // 推荐使用 surfaceContainerHighest 作为输入框背景，能最好地适配动态壁纸
-        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        focusedContainerColor = MaterialTheme.colorScheme.onPrimary,
+        unfocusedContainerColor = MaterialTheme.colorScheme.onPrimary,
         disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.38f),
         errorContainerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
 
