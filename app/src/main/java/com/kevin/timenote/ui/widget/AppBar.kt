@@ -20,8 +20,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.kevin.timenote.ui.theme.mainColor
-import com.kevin.timenote.ui.theme.onMainColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,8 +33,8 @@ fun AppBar(
     CenterAlignedTopAppBar(
         title = { Text(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = mainColor,
-            titleContentColor = onMainColor
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
         ),
         navigationIcon = {
             if (showBackIcon) {

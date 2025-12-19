@@ -46,6 +46,7 @@ android {
 //    }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.15"
@@ -80,6 +81,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.1")
     implementation("io.coil-kt.coil3:coil-compose:3.3.0")
     implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
+    implementation("com.jakewharton.timber:timber:5.0.1")
 //    implementation("io.github.theapache64:rebugger:1.0.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

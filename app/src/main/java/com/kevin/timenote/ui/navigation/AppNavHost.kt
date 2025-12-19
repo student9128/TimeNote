@@ -33,21 +33,23 @@ import com.kevin.timenote.ui.mine.MineScreen
 @Composable
 fun AppNavHost(
     navController: NavHostController,
-    startDestination: Destination,
+    startDestination: Any,
     modifier: Modifier = Modifier
 ) {
     NavHost(
         navController,
-        startDestination = startDestination.route
+        startDestination = startDestination
     ) {
-        Destination.entries.forEach { destination ->
-            composable(destination.route) {
-                when (destination) {
-                    Destination.Home -> HomeScreen()
-                    Destination.Mine -> MineScreen()
-                }
-            }
-        }
-        composable<Countdown> { CountdownScreen() }
+        composable<TimeRoute.Home> { HomeScreen() }
+        composable<TimeRoute.Mine> { MineScreen() }
+//        Destination.entries.forEach { destination ->
+//            composable(destination.route) {
+//                when (destination) {
+//                    Destination.Home -> HomeScreen()
+//                    Destination.Mine -> MineScreen()
+//                }
+//            }
+//        }
+        composable<TimeRoute.Countdown> { CountdownScreen() }
     }
 }

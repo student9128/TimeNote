@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.kevin.timenote.base.LocalNavController
 import com.kevin.timenote.base.LocalToast
@@ -23,8 +24,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun AppProviders(content: @Composable () -> Unit) {
-    val navController = rememberNavController()
+fun AppProviders(navController: NavController,content: @Composable () -> Unit) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()

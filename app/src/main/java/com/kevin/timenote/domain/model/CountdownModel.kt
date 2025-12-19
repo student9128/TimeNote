@@ -6,5 +6,8 @@ data class CountdownModel(
     val location: String,
     val type: String,
     val startTime: Long,
-    val endTime: Long
+    val endTime: Long,
+    val date: Long = System.currentTimeMillis(),
+    val lunarDate: Long = System.currentTimeMillis(),
+    val isLunar: Boolean = false
 )

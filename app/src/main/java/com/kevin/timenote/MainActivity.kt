@@ -7,6 +7,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,18 +22,18 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kevin.timenote.ui.navigation.AppNavHost
 import com.kevin.timenote.ui.navigation.Destination
-import com.kevin.timenote.base.LocalNavController
+import com.kevin.timenote.domain.model.ThemeMode
+import com.kevin.timenote.ui.navigation.TimeRoute
 import com.kevin.timenote.ui.theme.TimeNoteTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -39,41 +43,70 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            TimeNoteTheme {
+            val mainViewModel: MainViewModel = hiltViewModel()
+            // 监听主题变化
+            val currentThemeMode by mainViewModel.themeMode.collectAsStateWithLifecycle()
+
+            // 根据 Enum 计算 Theme 参数
+            val isDarkTheme = when (currentThemeMode) {
+                ThemeMode.Light -> false
+                ThemeMode.Dark -> true
+                ThemeMode.Dynamic -> isSystemInDarkTheme() // 跟随系统
+            }
+
+            val isDynamicColor = when (currentThemeMode) {
+                ThemeMode.Dynamic -> true // 只有 Dynamic 模式开启 Material You
+                else -> false
+            }
+            TimeNoteTheme(
+                darkTheme = isDarkTheme,
+                dynamicColor = isDynamicColor) {
                 val navController = rememberNavController()
-                val startDestination = Destination.Home
-                var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
-                AppProviders {
-                    Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-                        NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
-                            Destination.entries.forEachIndexed { index, destination ->
-                                NavigationBarItem(
-                                    selected = selectedDestination == index,
-                                    onClick = {
-                                        navController.navigate(route = destination.route) {
-                                            // 1. 弹出到导航图的起始目的地，避免栈内堆积重复的 Tab 实例
-                                            popUpTo(navController.graph.findStartDestination().id) {
-                                                saveState = true // 【关键】保存当前切走 Tab 的状态（如滚动位置）
-                                            }
+                val startDestination = TimeRoute.Home
+                val currentEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = currentEntry?.destination?.route
+                val showBottomBar = currentRoute == TimeRoute.Home::class.qualifiedName ||
+                        currentRoute == TimeRoute.Mine::class.qualifiedName
+                AppProviders(navController) {
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        bottomBar = {
+                            AnimatedVisibility(
+                                visible = showBottomBar,
+                                enter = slideInVertically(initialOffsetY = { it }),
+                                exit = slideOutVertically(targetOffsetY = { it })
+                            ) {
+                                NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
+                                    Destination.entries.forEachIndexed { index, destination ->
+                                        NavigationBarItem(
+                                            selected = currentRoute == destination.route::class.qualifiedName,
+                                            onClick = {
+                                                navController.navigate(route = destination.route) {
+                                                    // 1. 弹出到导航图的起始目的地，避免栈内堆积重复的 Tab 实例
+                                                    popUpTo(navController.graph.findStartDestination().id) {
+                                                        saveState =
+                                                            true // 【关键】保存当前切走 Tab 的状态（如滚动位置）
+                                                    }
 
-                                            // 2. 避免在同一个 Tab 上多次点击时产生多个实例
-                                            launchSingleTop = true
+                                                    // 2. 避免在同一个 Tab 上多次点击时产生多个实例
+                                                    launchSingleTop = true
 
-                                            // 3. 重新切回该 Tab 时，自动还原之前的状态
-                                            restoreState = true
-                                        }
-                                        selectedDestination = index
-                                    },
-                                    icon = {
-                                        Icon(
-                                            destination.icon,
-                                            contentDescription = destination.contentDescription
+                                                    // 3. 重新切回该 Tab 时，自动还原之前的状态
+                                                    restoreState = true
+                                                }
+                                            },
+                                            icon = {
+                                                Icon(
+                                                    destination.icon,
+                                                    contentDescription = destination.contentDescription
+                                                )
+                                            },
+                                            label = { Text(destination.label) }
                                         )
-                                    },
-                                    label = { Text(destination.label) }
-                                )
+                                    }
+                                }
                             }
-                        }
+
 //                        BottomAppBar() {
 //                            Row(
 //                                horizontalArrangement = Arrangement.SpaceEvenly,
@@ -87,7 +120,8 @@ class MainActivity : ComponentActivity() {
 //                                })
 //                            }
 //                        }
-                    }) { innerPadding ->
+                        },
+                       ) { innerPadding ->
                         AppNavHost(
                             navController,
                             startDestination,
@@ -97,12 +131,21 @@ class MainActivity : ComponentActivity() {
                 }
 //                CompositionLocalProvider(LocalNavController provides navController) {
 //                    Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-//                        NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
-//                            Destination.entries.forEachIndexed { index, destination ->
+//                        val currentEntry by navController.currentBackStackEntryAsState()
+//                        val currentRoute = currentEntry?.destination?.route
+//                        Log.d("currentRoute","currentRoute=${currentRoute}")
+//
+//                        val tabs = listOf(TimeRoute.Home, TimeRoute.Mine)
+//                        val showBottomBar = currentRoute == TimeRoute.Home::class.qualifiedName ||
+//                                    currentRoute == TimeRoute.Mine::class.qualifiedName
+//                        AnimatedVisibility(visible = showBottomBar,
+//                            enter = slideInVertically(initialOffsetY = { it }),
+//                            exit = slideOutVertically(targetOffsetY = { it }),) {NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
+//                            tabs.forEach { route->
 //                                NavigationBarItem(
-//                                    selected = selectedDestination == index,
+//                                    selected = currentRoute == route::class.qualifiedName,
 //                                    onClick = {
-//                                        navController.navigate(route = destination.route) {
+//                                        navController.navigate(route = route) {
 //                                            // 1. 弹出到导航图的起始目的地，避免栈内堆积重复的 Tab 实例
 //                                            popUpTo(navController.graph.findStartDestination().id) {
 //                                                saveState = true // 【关键】保存当前切走 Tab 的状态（如滚动位置）
@@ -114,18 +157,53 @@ class MainActivity : ComponentActivity() {
 //                                            // 3. 重新切回该 Tab 时，自动还原之前的状态
 //                                            restoreState = true
 //                                        }
-//                                        selectedDestination = index
 //                                    },
 //                                    icon = {
 //                                        Icon(
-//                                            destination.icon,
-//                                            contentDescription = destination.contentDescription
+//                                            imageVector = when (route) {
+//                                                TimeRoute.Home  -> Icons.Default.Home
+//                                                TimeRoute.Mine -> Icons.Default.Person
+//                                                else -> Icons.Default.Home
+//                                            },
+//                                            contentDescription = null
 //                                        )
 //                                    },
-//                                    label = { Text(destination.label) }
+//                                    label = { Text(  when (route) {
+//                                        TimeRoute.Home -> "Home"
+//                                        TimeRoute.Mine -> "Mine"
+//                                        else -> ""
+//                                    }) }
 //                                )
 //                            }
-//                        }
+////                            Destination.entries.forEachIndexed { index, destination ->
+////                                NavigationBarItem(
+////                                    selected = selectedDestination == destination.route,
+////                                    onClick = {
+////                                        navController.navigate(route = destination.route) {
+////                                            // 1. 弹出到导航图的起始目的地，避免栈内堆积重复的 Tab 实例
+////                                            popUpTo(navController.graph.findStartDestination().id) {
+////                                                saveState = true // 【关键】保存当前切走 Tab 的状态（如滚动位置）
+////                                            }
+////
+////                                            // 2. 避免在同一个 Tab 上多次点击时产生多个实例
+////                                            launchSingleTop = true
+////
+////                                            // 3. 重新切回该 Tab 时，自动还原之前的状态
+////                                            restoreState = true
+////                                        }
+////                                        selectedDestination = index
+////                                    },
+////                                    icon = {
+////                                        Icon(
+////                                            destination.icon,
+////                                            contentDescription = destination.contentDescription
+////                                        )
+////                                    },
+////                                    label = { Text(destination.label) }
+////                                )
+////                            }
+//                        } }
+//
 ////                        BottomAppBar() {
 ////                            Row(
 ////                                horizontalArrangement = Arrangement.SpaceEvenly,

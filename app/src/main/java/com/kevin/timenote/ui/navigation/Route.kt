@@ -6,28 +6,27 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
 
-//sealed class Route(val route: String) {
-//    object Main : Route("main")
-//    object Home : Route("home")
-//    object Mine : Route("mine")
-//    object Countdown : Route("countdown")
-//}
 
 @Serializable
-object Home
+sealed class TimeRoute{
+    @Serializable
+    object Home
 
-@Serializable
-object Mine
+    @Serializable
+    object Mine
 
-@Serializable
-object Countdown
+    @Serializable
+    object Countdown
+}
+
+
 
 enum class Destination(
-    val route: String,
+    val route: Any,
     val label: String,
     val icon: ImageVector,
     val contentDescription: String
 ){
-    Home("Home", "Home", Icons.Default.Home, "Home"),
-    Mine("Mine", "Mine", Icons.Default.Person, "Mine"),
+    Home(TimeRoute.Home, "Home", Icons.Default.Home, "Home"),
+    Mine(TimeRoute.Mine, "Mine", Icons.Default.Person, "Mine"),
 }

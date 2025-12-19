@@ -2,13 +2,16 @@ package com.kevin.timenote.di
 
 import com.kevin.timenote.data.local.dao.CountdownDao
 import com.kevin.timenote.data.repository.CountdownRepositoryImpl
+import com.kevin.timenote.data.repository.SettingsRepositoryImpl
 import com.kevin.timenote.domain.repository.CountdownRepository
+import com.kevin.timenote.domain.repository.SettingsRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+
 //用 @Binds的需要用 interface和 impl类 必须是抽象的这一点CountdownRepository正好满足
 
 //@Module
@@ -33,5 +36,9 @@ abstract class RepositoryModule {
     abstract fun bindCountdownRepository(
         impl: CountdownRepositoryImpl
     ): CountdownRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
 }
 

@@ -2,17 +2,21 @@ package com.kevin.timenote.ui.home
 
 import android.net.Uri
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,12 +24,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.gson.Gson
 import com.kevin.timenote.ui.countdown.CountdownItem
 import com.kevin.timenote.base.LocalNavController
-import com.kevin.timenote.ui.navigation.Countdown
+import com.kevin.timenote.ui.navigation.TimeRoute
 import com.kevin.timenote.ui.widget.TimeTopBar
 import com.nlf.calendar.Solar
 import okhttp3.Route
@@ -42,8 +47,10 @@ fun HomeScreen(
 
     }
 //
-    Scaffold(topBar = {
-        TimeTopBar(title = "", onSearchClick = {})
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TimeTopBar(title = "", onSearchClick = {})
 //        TopAppBar(
 //            colors = TopAppBarDefaults.topAppBarColors(
 //                containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -53,21 +60,28 @@ fun HomeScreen(
 //                Text("Small Top App Bar")
 //            }
 //        )
-    }, floatingActionButton = {
-        FloatingActionButton(
-            onClick = { /* do something */ },
-            containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
-        ) {
-            Icon(Icons.Filled.Add, "Add something")
+        }, floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate(TimeRoute.Countdown) },
+                modifier = Modifier.padding(bottom = 80.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    ""
+                )
+            }
         }
-    }) { innerPadding ->
+    ) { innerPadding ->
 
-        Column(modifier = Modifier.padding(innerPadding)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             Text(date)
             Button(
                 onClick = {
-                    navController.navigate(Countdown)
+                    navController.navigate(TimeRoute.Countdown)
                 }
             ) {
                 Text("添加倒计时")

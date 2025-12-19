@@ -5,8 +5,11 @@ data class CountdownEditUiState(
     val title: String = "",
     val location: String = "",
     val type: String = "",
-    val startTime: Long = 0L,
-    val endTime: Long = 0L
+    val startTime: Long = System.currentTimeMillis(),
+    val endTime: Long = System.currentTimeMillis(),
+    val date: Long = System.currentTimeMillis(),
+    val lunarDate: Long = System.currentTimeMillis(),
+    val isLunar: Boolean = false
 ) {
     val isEditMode: Boolean get() = id != 0L
 }
