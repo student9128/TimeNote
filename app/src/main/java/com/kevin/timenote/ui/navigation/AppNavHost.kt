@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.kevin.timenote.ui.countdown.CountdownDetailScreen
 import com.kevin.timenote.ui.countdown.CountdownScreen
 import com.kevin.timenote.ui.home.HomeScreen
 import com.kevin.timenote.ui.mine.MineScreen
@@ -51,5 +52,6 @@ fun AppNavHost(
 //            }
 //        }
         composable<TimeRoute.Countdown> { CountdownScreen() }
+        composable<TimeRoute.CountdownDetail> { CountdownDetailScreen() }
     }
 }

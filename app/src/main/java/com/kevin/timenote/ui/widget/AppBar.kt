@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.kevin.timenote.base.LocalNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,21 +52,48 @@ fun AppBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TimeTopBar(modifier: Modifier = Modifier, title: String = "", onSearchClick: () -> Unit = {}) {
+fun TimeTopBar(
+    modifier: Modifier = Modifier,
+    title: String = "",
+    showSearch: Boolean = false,
+    showBackIcon: Boolean = true,
+    onBackClick: (() -> Unit)? = null,
+    onSearchClick: () -> Unit = {},
+) {
+    val current = LocalNavController.current
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
+        navigationIcon = {
+            if (showBackIcon) {
+                IconButton(onClick = {
+                    if (onBackClick == null) {
+                        current.popBackStack()
+                    } else {
+                        onBackClick.invoke()
+                    }
+                },) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Localized description",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        },
         title = {
             Text(title)
         },
         actions = {
-            IconButton(onClick = onSearchClick) {
-                Icon(
-                    imageVector = Icons.Filled.Search,
-                    contentDescription = "Share items"
-                )
+            if (showSearch) {
+                IconButton(onClick = onSearchClick) {
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = "Share items"
+                    )
+                }
             }
         },
     )

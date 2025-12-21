@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-sealed class TimeRoute{
+sealed class TimeRoute {
     @Serializable
     object Home
 
@@ -17,8 +17,10 @@ sealed class TimeRoute{
 
     @Serializable
     object Countdown
-}
 
+    @Serializable
+    object CountdownDetail
+}
 
 
 enum class Destination(
@@ -26,7 +28,7 @@ enum class Destination(
     val label: String,
     val icon: ImageVector,
     val contentDescription: String
-){
+) {
     Home(TimeRoute.Home, "Home", Icons.Default.Home, "Home"),
     Mine(TimeRoute.Mine, "Mine", Icons.Default.Person, "Mine"),
 }

@@ -22,6 +22,8 @@ val padding20 = 20.dp
 val cardPadding = 10.dp
 
 val spaceHeight=16.dp
+val spaceHeight10=10.dp
+val spaceHeight20=20.dp
 
 val circleTabPaddingHorizontal = 10.dp
 val circleTabPaddingVertical = 3.dp

@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 
 @HiltViewModel
 class CountdownEditViewModel @Inject constructor(
@@ -36,6 +37,7 @@ class CountdownEditViewModel @Inject constructor(
             initialValue = emptyList()
         )
     var selectedType by mutableStateOf("倒数日")
+
     init {
         savedStateHandle.get<String>("model")?.let {
             val model = Gson().fromJson(it, CountdownModel::class.java)
@@ -49,7 +51,10 @@ class CountdownEditViewModel @Inject constructor(
                 endTime = model.endTime,
                 date = model.date,
                 lunarDate = model.lunarDate,
-                isLunar = model.isLunar
+                isLunar = model.isLunar,
+                eventTypeName = model.eventTypeName,
+                eventTypeColor = model.eventTypeColor
+
 
             )
         }
@@ -66,9 +71,22 @@ class CountdownEditViewModel @Inject constructor(
     fun updateTitle(value: String) {
         _uiState.value = _uiState.value.copy(title = value)
     }
-    fun updateDate(value: Long){
+
+    fun updateDate(value: Long) {
         _uiState.value = _uiState.value.copy(date = value)
     }
+
+    fun updateEventTypeName(value: String) {
+        _uiState.value = _uiState.value.copy(eventTypeName = value)
+    }
+
+    // 只保留这一个公开方法
+    fun updateState(transform: (CountdownEditUiState) -> CountdownEditUiState) {
+        // 使用 .update 保证并发更新时的原子性 (Atomic)
+        _uiState.update { transform(it) }
+    }
+
+
 
     fun save(onFinish: () -> Unit) {
         viewModelScope.launch {
@@ -83,7 +101,9 @@ class CountdownEditViewModel @Inject constructor(
                     endTime = s.endTime,
                     date = s.date,
                     lunarDate = s.lunarDate,
-                    isLunar = s.isLunar
+                    isLunar = s.isLunar,
+                    eventTypeName = s.eventTypeName,
+                    eventTypeColor = s.eventTypeColor
                 )
             )
             onFinish()
@@ -103,7 +123,9 @@ class CountdownEditViewModel @Inject constructor(
                     endTime = s.endTime,
                     date = s.date,
                     lunarDate = s.lunarDate,
-                    isLunar = s.isLunar
+                    isLunar = s.isLunar,
+                    eventTypeName = s.eventTypeName,
+                    eventTypeColor = s.eventTypeColor
                 )
             )
             onFinish()

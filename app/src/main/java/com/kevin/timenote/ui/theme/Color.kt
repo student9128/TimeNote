@@ -124,3 +124,17 @@ val SurfaceContainerLowDark = Color(0xFF1D1B20)
 val SurfaceContainerDark = Color(0xFF211F26)
 val SurfaceContainerHighDark = Color(0xFF2B2930)
 val SurfaceContainerHighestDark = Color(0xFF36343B)
+
+val BrightRed    = Color(0xFFFF5252)
+val BrightOrange = Color(0xFFFF9800)
+val BrightYellow = Color(0xFFFFEB3B)
+val BrightGreen  = Color(0xFF00FF9C)
+val BrightCyan   = Color(0xFF26C6DA)
+val BrightBlue   = Color(0xFF42A5F5)
+val BrightPurple = Color(0xFFAB47BC)
+val eventDefaultColor = 0xFF42A5F5
+val birthdayColor = 0xFF00FF9C
+val anniversaryColor = 0xFFFF5252
+
+
+

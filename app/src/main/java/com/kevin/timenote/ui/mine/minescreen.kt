@@ -37,7 +37,7 @@ fun MineScreen(mainViewModel: MainViewModel = hiltViewModel()) {
         // 直接关闭当前 Activity，即退出 App
         activity?.finish()
     }
-    Scaffold(topBar = { TimeTopBar(title = "我的") }) { innerPadding ->
+    Scaffold(topBar = { TimeTopBar(title = "我的", showBackIcon = false) }) { innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)

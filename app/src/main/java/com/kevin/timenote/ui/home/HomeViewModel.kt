@@ -29,16 +29,19 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val _dateLunar = MutableStateFlow("")
     val dateLunar = _dateLunar.asStateFlow()
+    val _dateJieQi = MutableStateFlow("")
+    val dateJieQi = _dateJieQi.asStateFlow()
 
     init {
 //        val now: Instant = Clock.System.now()
 //        val today: LocalDate = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
 // or shorter
         val today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        val x = Solar.fromYmd(today.year, today.month.number, today.day).lunar.toString()
+        val lunar = Solar.fromYmd(today.year, today.month.number, today.day).lunar
         _dateLunar.update {
-            x
+            "${lunar}"
         }
+        _dateJieQi.update { lunar.jieQi }
     }
 
     val countdowns = countdownUseCase.observeCountdowns()
