@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -96,20 +97,31 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.Center
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentPadding = PaddingValues(top = uniformPadding, bottom = uniformPadding),
-                verticalArrangement = Arrangement.Top
-            ) {
-                items(list) { model ->
-                    CountdownItem(model) {
-                        navController.navigate(TimeRoute.CountdownDetail(model.id))
+            if (list.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentPadding = PaddingValues(top = uniformPadding, bottom = uniformPadding),
+                    verticalArrangement = Arrangement.Top
+                ) {
+                    items(list) { model ->
+                        CountdownItem(model) {
+                            navController.navigate(TimeRoute.CountdownDetail(model.id))
+                        }
                     }
                 }
+            } else {
+                Text(
+                    "暂无添加任何事项\n点右下角+快去添加吧",
+                    textAlign = TextAlign.Center,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
