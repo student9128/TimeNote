@@ -14,12 +14,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.google.gson.Gson
 import com.kevin.timenote.domain.usecase.EventTypeUseCase
+import com.nlf.calendar.Solar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import java.util.Date
 
 @HiltViewModel
 class CountdownEditViewModel @Inject constructor(
@@ -100,7 +102,7 @@ class CountdownEditViewModel @Inject constructor(
                     startTime = s.startTime,
                     endTime = s.endTime,
                     date = s.date,
-                    lunarDate = s.lunarDate,
+                    lunarDate =s.lunarDate,
                     isLunar = s.isLunar,
                     eventTypeName = s.eventTypeName,
                     eventTypeColor = s.eventTypeColor

@@ -19,7 +19,7 @@ sealed class TimeRoute {
     object Countdown
 
     @Serializable
-    object CountdownDetail
+    data class CountdownDetail(val id: Long)
 }
 
 

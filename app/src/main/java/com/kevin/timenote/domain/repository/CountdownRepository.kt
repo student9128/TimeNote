@@ -11,5 +11,7 @@ interface CountdownRepository {
 
     suspend fun updateCountdown(event: CountdownModel)
 
+    fun getCountdownById(id: Long): Flow<CountdownModel>
+
     fun observeCountdowns(): Flow<List<CountdownModel>>
 }

@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.kevin.timenote.data.local.entity.CountdownEntity
+import com.kevin.timenote.domain.model.CountdownModel
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -21,6 +22,9 @@ interface CountdownDao {
     @Update
     suspend fun update(entity: CountdownEntity)
 
-    @Query("SELECT * FROM countdown ORDER BY startTime ASC")
+    @Query("SELECT * FROM countdown ORDER BY date ASC")
     fun observeAll(): Flow<List<CountdownEntity>>
+
+    @Query("SELECT * FROM countdown WHERE id = :id")
+    fun getCountdownById(id: Long): Flow<CountdownModel>
 }

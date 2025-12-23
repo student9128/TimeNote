@@ -10,7 +10,7 @@ data class CountdownEditUiState(
     val startTime: Long = System.currentTimeMillis(),
     val endTime: Long = System.currentTimeMillis(),
     val date: Long = System.currentTimeMillis(),
-    val lunarDate: Long = System.currentTimeMillis(),
+    val lunarDate: String="",
     val isLunar: Boolean = false,
     val eventTypeName: String = "倒数日", // 事件类型名称，提供默认值
     val eventTypeColor: Long = eventDefaultColor

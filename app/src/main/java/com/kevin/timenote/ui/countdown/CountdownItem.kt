@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,24 +20,35 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.layout.Spacer
+import com.kevin.timenote.common.util.daysUntilTarget
+import com.kevin.timenote.common.util.formatWithPattern
 import com.kevin.timenote.domain.model.CountdownModel
 import com.kevin.timenote.ui.theme.cornerCard
 import com.kevin.timenote.ui.theme.padding10
+import com.kevin.timenote.ui.theme.uniformPadding
+import com.nlf.calendar.Solar
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.daysUntil
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
 import java.time.LocalDateTime
+import java.util.Date
 import kotlin.math.abs
 import kotlin.text.append
 import kotlin.text.format
@@ -49,54 +61,71 @@ fun CountdownItem(
     model: CountdownModel,
     onClick: () -> Unit
 ) {
-    Column(
+    val date = model.date
+    val days = model.date.daysUntilTarget()
+    val title = model.title
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 5.dp)
+            .padding(horizontal = uniformPadding, vertical = 5.dp)
+            .clip(RoundedCornerShape(cornerCard))
             .background(
-                MaterialTheme.colorScheme.onPrimary, shape = RoundedCornerShape(
-                    cornerCard
-                ))
-            .padding(16.dp)
-
+//                shape = RoundedCornerShape(cornerCard),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+            .drawBehind({
+                val strokeWidth = cornerCard.toPx()
+                drawLine(
+                    color = Color(model.eventTypeColor),
+                    start = Offset(0f, 0f),
+                    end = Offset(0f, size.height),
+                    strokeWidth = strokeWidth
+                )
+            })
+            .padding(uniformPadding)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+//                .clickable(onClick = onClick)
+//                .padding(horizontal = 16.dp, vertical = 5.dp)
+//                .background(
+//                    MaterialTheme.colorScheme.onPrimary, shape = RoundedCornerShape(
+//                        cornerCard
+//                    )
+//                )
+//                .padding(16.dp)
+
         ) {
-            Text(processEventTitle(model))
-            Spacer(Modifier.width(5.dp))
+            Text(
+                "${model.title}",
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                if (!model.isLunar) {
+                    "日期：${model.date.formatWithPattern("yyyy年MM月dd日")}"
+                } else {
+                    "日期：农历${model.lunarDate}"
+                }
+            )
+            Text(processEventTitle(days, title, model.eventTypeName))
+        }
+        if (days < 0) {
             Box(
                 Modifier
-                    .background(Color(model.eventTypeColor), shape = CircleShape)
+                    .background(Color(0xffF5F2F2), shape = CircleShape)
                     .width(5.dp)
                     .height(5.dp)
             )
         }
-        Text("目标日期${formatDate(model.date)}")
-
     }
 }
 
 @OptIn(ExperimentalTime::class)
-fun processEventTitle(model: CountdownModel): AnnotatedString {
-    // 1. 获取当前系统时区
-    val timeZone = TimeZone.currentSystemDefault()
-
-    // 2. 获取当前的日期 (LocalDate)
-    val today: LocalDate = Clock.System.todayIn(kotlinx.datetime.TimeZone.currentSystemDefault())
-
-    // 3. 将目标 Long 时间戳转为 LocalDate
-    // 注意：如果是毫秒级时间戳 (Milliseconds)，直接用 fromEpochMilliseconds
-    // 如果是秒级 (Seconds)，用 fromEpochSeconds
-    val targetDate = Instant.fromEpochMilliseconds(model.date)
-        .toLocalDateTime(timeZone)
-        .date
-
-    // 4. 计算天数差 (today 到 targetDate 的距离)
-    val days = today.daysUntil(targetDate)
+fun processEventTitle(days: Long, title: String, event: String): AnnotatedString {
     val highlightStyle = SpanStyle(
         fontWeight = FontWeight.Bold,
         fontSize = 16.sp
@@ -105,16 +134,17 @@ fun processEventTitle(model: CountdownModel): AnnotatedString {
     )
     val absDays = abs(days)
     return buildAnnotatedString {
-        when (model.eventTypeName) {
+        when (event) {
             "倒数日", "纪念日" -> {
                 if (days >= 0) {
                     append("距离 ")
-                    withStyle(highlightStyle) { append(model.title) }
+//                    withStyle(highlightStyle) { append(title) }
+                    append(title)
                     append(" 还有 ")
                     withStyle(highlightStyle) { append(absDays.toString()) }
                     append(" 天")
                 } else {
-                    withStyle(highlightStyle) { append(model.title) }
+                    append(title)
                     append(" 已经过去 ")
                     withStyle(highlightStyle) { append(absDays.toString()) }
                     append(" 天")
@@ -122,15 +152,22 @@ fun processEventTitle(model: CountdownModel): AnnotatedString {
             }
 
             "生日" -> {
-                append("距离 ")
-                withStyle(highlightStyle) { append(model.title) }
-                append(" 生日还有 ")
-                withStyle(highlightStyle) { append(absDays.toString()) }
-                append(" 天")
+                if (days >= 0) {
+                    append("距离 ")
+                    append(title)
+                    append(" 生日还有 ")
+                    withStyle(highlightStyle) { append(absDays.toString()) }
+                    append(" 天")
+                } else {
+                    append(title)
+                    append(" 已经过去 ")
+                    withStyle(highlightStyle) { append(absDays.toString()) }
+                    append(" 天")
+                }
             }
 
             else -> {
-                withStyle(highlightStyle) { append(model.title) }
+                withStyle(highlightStyle) { append(title) }
                 append(" ")
                 withStyle(highlightStyle) { append(days.toString()) }
                 append(" 天")

@@ -3,6 +3,7 @@ package com.kevin.timenote.ui.home
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,7 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -36,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.gson.Gson
 import com.kevin.timenote.ui.countdown.CountdownItem
 import com.kevin.timenote.base.LocalNavController
+import com.kevin.timenote.common.util.formatWithPattern
 import com.kevin.timenote.ui.navigation.TimeRoute
 import com.kevin.timenote.ui.theme.uniformPadding
 import com.kevin.timenote.ui.widget.TimeTopBar
@@ -56,9 +59,17 @@ fun HomeScreen(
     }
 //
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 80.dp),
+
         topBar = {
-            TimeTopBar(title = "", showBackIcon = false, showSearch = true, onSearchClick = {})
+            TimeTopBar(
+                title = "${System.currentTimeMillis().formatWithPattern("yyyy年MM月dd日")}",
+                subTitle = "农历 $date",
+                showBackIcon = false,
+                showSearch = true,
+                onSearchClick = {})
 //        TopAppBar(
 //            colors = TopAppBarDefaults.topAppBarColors(
 //                containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -71,14 +82,15 @@ fun HomeScreen(
         }, floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(TimeRoute.Countdown) },
-                modifier = Modifier.padding(bottom = 80.dp)
+//                modifier = Modifier.padding(bottom = 80.dp)
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     ""
                 )
             }
-        }
+        },
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets
     ) { innerPadding ->
 
         Column(
@@ -86,25 +98,16 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            Row(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = uniformPadding),
-                horizontalArrangement = Arrangement.Center
+                    .weight(1f),
+                contentPadding = PaddingValues(top = uniformPadding, bottom = uniformPadding),
+                verticalArrangement = Arrangement.Top
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text("今天是")
-                    Text(date, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    Text(dateJieQi)
-                }
-            }
-            LazyColumn(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top) {
                 items(list) { model ->
                     CountdownItem(model) {
-                        navController.navigate(TimeRoute.CountdownDetail)
+                        navController.navigate(TimeRoute.CountdownDetail(model.id))
                     }
                 }
             }

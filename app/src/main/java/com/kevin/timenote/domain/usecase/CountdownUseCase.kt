@@ -30,4 +30,6 @@ class CountdownUseCase @Inject constructor(
     suspend fun delete(model: CountdownModel) =
         repository.deleteCountdown(model)
 
+    fun getCountdownById(id: Long)=repository.getCountdownById(id)
+
 }

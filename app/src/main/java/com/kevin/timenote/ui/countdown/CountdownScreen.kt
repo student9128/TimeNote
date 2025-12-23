@@ -175,6 +175,10 @@ fun CountdownScreen(
                             )
                         )
                         .padding(uniformPadding)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) { showDatePicker=true },
                 ) {
                     Row(
                         modifier = Modifier
@@ -211,7 +215,10 @@ fun CountdownScreen(
                     CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 20.dp) {
                         Checkbox(
                             checked = useLunar,
-                            onCheckedChange = { v -> useLunar = v }
+                            onCheckedChange = { v ->
+                                useLunar = v
+                                viewModel.updateState { it.copy(isLunar = v, lunarDate = lunarDate) }
+                            }
                         )
                         Text("使用农历")
                     }
@@ -250,7 +257,7 @@ fun CountdownScreen(
                     confirmButton = {
                         TextButton(onClick = {
                             showDatePicker = false
-                            datePickerState.selectedDateMillis?.let { viewModel.updateDate(it) }
+                            datePickerState.selectedDateMillis?.let {date-> viewModel.updateState{it.copy(date=date, lunarDate = lunarDate)} }
                         }, enabled = confirmEnabled.value) {
                             Text("确定")
                         }

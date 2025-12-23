@@ -12,7 +12,10 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -20,11 +23,15 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -67,9 +74,13 @@ class MainActivity : ComponentActivity() {
                 val currentRoute = currentEntry?.destination?.route
                 val showBottomBar = currentRoute == TimeRoute.Home::class.qualifiedName ||
                         currentRoute == TimeRoute.Mine::class.qualifiedName
+                val bottom: Dp = with(LocalDensity.current) {
+                WindowInsets.navigationBars.getBottom(this).toDp()
+            }
                 AppProviders(navController) {
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
+                        contentWindowInsets = ScaffoldDefaults.contentWindowInsets,
                         bottomBar = {
                             AnimatedVisibility(
                                 visible = showBottomBar,

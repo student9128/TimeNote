@@ -1,5 +1,6 @@
 package com.kevin.timenote.ui.widget
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.kevin.timenote.base.LocalNavController
@@ -55,6 +57,7 @@ fun AppBar(
 fun TimeTopBar(
     modifier: Modifier = Modifier,
     title: String = "",
+    subTitle: String = "",
     showSearch: Boolean = false,
     showBackIcon: Boolean = true,
     onBackClick: (() -> Unit)? = null,
@@ -68,13 +71,15 @@ fun TimeTopBar(
         ),
         navigationIcon = {
             if (showBackIcon) {
-                IconButton(onClick = {
-                    if (onBackClick == null) {
-                        current.popBackStack()
-                    } else {
-                        onBackClick.invoke()
-                    }
-                },) {
+                IconButton(
+                    onClick = {
+                        if (onBackClick == null) {
+                            current.popBackStack()
+                        } else {
+                            onBackClick.invoke()
+                        }
+                    },
+                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Localized description",
@@ -84,7 +89,12 @@ fun TimeTopBar(
             }
         },
         title = {
-            Text(title)
+            Column {
+                Text(title)
+                if (subTitle.isNotEmpty()) {
+                    Text(subTitle, fontSize = 12.sp)
+                }
+            }
         },
         actions = {
             if (showSearch) {

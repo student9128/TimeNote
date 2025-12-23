@@ -39,7 +39,7 @@ class HomeViewModel @Inject constructor(
         val today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
         val lunar = Solar.fromYmd(today.year, today.month.number, today.day).lunar
         _dateLunar.update {
-            "${lunar}"
+            "${lunar}  星期${lunar.weekInChinese}"
         }
         _dateJieQi.update { lunar.jieQi }
     }

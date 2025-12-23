@@ -13,7 +13,7 @@ data class CountdownEntity(
     val startTime: Long,
     val endTime: Long,
     val date: Long,
-    val lunarDate: Long,
+    val lunarDate: String,
     val isLunar: Boolean,
     val eventTypeName: String, // 事件类型名称，提供默认值
     val eventTypeColor: Long
