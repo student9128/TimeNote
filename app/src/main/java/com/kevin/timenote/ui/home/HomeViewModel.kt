@@ -32,7 +32,7 @@ class HomeViewModel @Inject constructor(
     private val _dateJieQi = MutableStateFlow("")
     val dateJieQi = _dateJieQi.asStateFlow()
 
-    private val _filterType = MutableStateFlow(0) // 0: 全部, 1: 今天, 2: 过去, 3: 未来
+    private val _filterType = MutableStateFlow(1) // 0: 今天, 1: 未来, 2: 过去, 3: 全部
 //  本地筛选
 private val _allCountdowns = countdownUseCase.observeCountdowns()
     .stateIn(
@@ -46,9 +46,9 @@ private val _allCountdowns = countdownUseCase.observeCountdowns()
         val todayEnd = getEndOfDay(now)
 
         when (filter) {
-            1 -> list.filter { it.date in todayStart..todayEnd } // 今天
+            0 -> list.filter { it.date in todayStart..todayEnd } // 今天
             2 -> list.filter { it.date < todayStart } // 过去
-            3 -> list.filter { it.date > todayEnd } // 未来
+            1 -> list.filter { it.date > todayEnd } // 未来
             else -> list // 全部
         }
     }.stateIn(viewModelScope,SharingStarted.WhileSubscribed(5_000),

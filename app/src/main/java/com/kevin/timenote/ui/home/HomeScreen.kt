@@ -61,8 +61,8 @@ fun HomeScreen(
     val date by viewModel.dateLunar.collectAsStateWithLifecycle()
     val dateJieQi by viewModel.dateJieQi.collectAsStateWithLifecycle()
     
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("全部", "今天", "过去", "未来")
+    var selectedTabIndex by remember { mutableIntStateOf(1) }
+    val tabs = listOf( "今天","未来", "过去", "全部",)
 
     Scaffold(
         modifier = Modifier
