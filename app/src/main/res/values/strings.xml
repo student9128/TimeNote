@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">TimeNote</string>
+    <string name="shortcut_add_event_short">新事项</string>
+    <string name="shortcut_add_event_long">添加新事项</string>
 </resources>

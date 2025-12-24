@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
+        android:name=".TimeNoteApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -16,19 +17,34 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name=".TimeNoteApp"
         android:theme="@style/Theme.TimeNote">
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.TimeNote">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+            <intent-filter>
+                <!-- DeepLink / AppLink / 浏览器点击-->
+                <action android:name="android.intent.action.VIEW" />
+                <!-- 所有 startActivity 的普通调用-->
+                <category android:name="android.intent.category.DEFAULT" />
+                <!-- 从浏览器 / Shortcut / Web 调用时-->
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="add_event"
+                    android:scheme="timenote" />
+            </intent-filter>
         </activity>
+
         <receiver
             android:name=".TimeWidgetReceiver"
             android:exported="true"
@@ -46,7 +62,7 @@
             android:name=".receiver.ReminderReceiver"
             android:enabled="true"
             android:exported="false">
-             <intent-filter>
+            <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>

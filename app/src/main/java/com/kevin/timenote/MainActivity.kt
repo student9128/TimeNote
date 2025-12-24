@@ -1,5 +1,6 @@
 package com.kevin.timenote
 
+import android.app.ComponentCaller
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
@@ -26,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,12 +36,14 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kevin.timenote.ui.navigation.AppNavHost
 import com.kevin.timenote.ui.navigation.Destination
 import com.kevin.timenote.domain.model.ThemeMode
+import com.kevin.timenote.ui.countdown.CountdownScreen
 import com.kevin.timenote.ui.navigation.TimeRoute
 import com.kevin.timenote.ui.theme.TimeNoteTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,6 +81,11 @@ class MainActivity : ComponentActivity() {
                 val bottom: Dp = with(LocalDensity.current) {
                 WindowInsets.navigationBars.getBottom(this).toDp()
             }
+//                LaunchedEffect("") {
+//                    if (intent?.data?.toString() == "timenote://add_event") {
+//                        navController.navigate(CountdownScreen()) // Replace with your actual route string for CountdownScreen
+//                    }
+//                }
                 AppProviders(navController) {
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
@@ -238,6 +247,11 @@ class MainActivity : ComponentActivity() {
 //                }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
+        super.onNewIntent(intent, caller)
+        setIntent(intent)
     }
 }
 

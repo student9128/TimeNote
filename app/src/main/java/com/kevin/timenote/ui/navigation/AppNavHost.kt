@@ -7,6 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.kevin.timenote.ui.countdown.CountdownDetailScreen
 import com.kevin.timenote.ui.countdown.CountdownScreen
 import com.kevin.timenote.ui.home.HomeScreen
@@ -51,7 +52,13 @@ fun AppNavHost(
 //                }
 //            }
 //        }
-        composable<TimeRoute.Countdown> { CountdownScreen() }
+        composable<TimeRoute.Countdown>(
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern = "timenote://add_event"
+                }
+            )
+        ) { CountdownScreen() }
         composable<TimeRoute.CountdownDetail> { CountdownDetailScreen() }
     }
 }
