@@ -28,7 +28,9 @@ class HomeViewModel @Inject constructor(
     private val countdownUseCase: CountdownUseCase
 ) : ViewModel() {
     private val _dateLunar = MutableStateFlow("")
+    private val _dateSolarFestival = MutableStateFlow("")
     val dateLunar = _dateLunar.asStateFlow()
+    val dateSolarFestival = _dateSolarFestival.asStateFlow()
     private val _dateJieQi = MutableStateFlow("")
     val dateJieQi = _dateJieQi.asStateFlow()
 
@@ -72,8 +74,17 @@ private val _allCountdowns = countdownUseCase.observeCountdowns()
 //    )
 
     init {
+        refreshDate()
+    }
+
+    fun refreshDate() {
         val today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        val lunar = Solar.fromYmd(today.year, today.month.number, today.dayOfMonth).lunar
+        val todayYmd = Solar.fromYmd(today.year, today.month.number, today.day)
+        val festival = todayYmd.festivals.firstOrNull()
+        if(festival!=null){
+            _dateSolarFestival.value=festival
+        }
+        val lunar = todayYmd.lunar
         _dateLunar.update {
             "${lunar}  星期${lunar.weekInChinese}"
         }

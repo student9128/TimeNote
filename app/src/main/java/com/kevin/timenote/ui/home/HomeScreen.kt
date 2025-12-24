@@ -21,12 +21,14 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -35,11 +37,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.gson.Gson
 import com.kevin.timenote.ui.countdown.CountdownItem
@@ -59,7 +64,21 @@ fun HomeScreen(
     val list by viewModel.filteredCountdowns.collectAsStateWithLifecycle()
     val navController = LocalNavController.current
     val date by viewModel.dateLunar.collectAsStateWithLifecycle()
+    val festival by viewModel.dateSolarFestival.collectAsStateWithLifecycle()
     val dateJieQi by viewModel.dateJieQi.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshDate()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
     
     var selectedTabIndex by remember { mutableIntStateOf(1) }
     val tabs = listOf( "今天","未来", "过去", "全部",)
@@ -73,6 +92,7 @@ fun HomeScreen(
             TimeTopBar(
                 title = "${System.currentTimeMillis().formatWithPattern("yyyy年MM月dd日")}",
                 subTitle = "农历 $date",
+                festival = festival,
                 showBackIcon = false,
                 showSearch = true,
                 onSearchClick = {})
@@ -95,7 +115,7 @@ fun HomeScreen(
                 .padding(innerPadding),
             verticalArrangement = Arrangement.Top
         ) {
-            TabRow(selectedTabIndex = selectedTabIndex) {
+            PrimaryTabRow(selectedTabIndex = selectedTabIndex) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
                         selected = selectedTabIndex == index,
