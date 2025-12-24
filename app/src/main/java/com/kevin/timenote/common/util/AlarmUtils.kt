@@ -10,7 +10,6 @@ import com.kevin.timenote.domain.model.CountdownModel
 import com.kevin.timenote.domain.model.RepeatMode
 import com.kevin.timenote.receiver.ReminderReceiver
 import com.nlf.calendar.Lunar
-import com.nlf.calendar.Solar
 import java.lang.System
 import java.util.Calendar
 import java.util.Date
@@ -36,11 +35,7 @@ object AlarmUtils {
 
         val triggerTime = if (model.isLunar) {
             val target = Calendar.getInstance().apply { timeInMillis = model.date }
-            nextLunarTriggerTime(
-                lunarKey = model.lunarDate,
-                hour = target.get(Calendar.HOUR_OF_DAY),
-                minute = target.get(Calendar.MINUTE)
-            )
+            nextLunarTriggerTime(model.lunarDate,)
         } else {
             calculateTriggerTime(model)
         }
@@ -220,25 +215,21 @@ object AlarmUtils {
         }
     }
     private fun nextLunarTriggerTime(
-        lunarKey: String,
-        hour: Int,
-        minute: Int
+        lunarDate: String,
     ): Long {
-        val (lunarMonth, lunarDay) = lunarKey.split("-").map { it.toInt() }
-
         val now = Calendar.getInstance()
         var year = now.get(Calendar.YEAR)
-
+        val (targetYear, targetMonth, targetDay) = ChineseLunarParser.parse(lunarDate)
+            ?: return -1L
         while (true) {
-            val lunar = com.nlf.calendar.Lunar.fromYmd(year, lunarMonth, lunarDay)
+            val lunar = Lunar.fromYmd(targetYear, targetMonth, targetDay)
             val solar = lunar.solar
-
             val cal = Calendar.getInstance().apply {
                 set(Calendar.YEAR, solar.year)
                 set(Calendar.MONTH, solar.month - 1)
                 set(Calendar.DAY_OF_MONTH, solar.day)
-                set(Calendar.HOUR_OF_DAY, hour)
-                set(Calendar.MINUTE, minute)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
             }
@@ -248,7 +239,9 @@ object AlarmUtils {
             }
 
             year++
+            if (year > now.get(Calendar.YEAR) + 5) break
         }
+        return -1
     }
 
 

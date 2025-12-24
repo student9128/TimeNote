@@ -91,7 +91,8 @@ fun HomeScreen(
         topBar = {
             TimeTopBar(
                 title = "${System.currentTimeMillis().formatWithPattern("yyyy年MM月dd日")}",
-                subTitle = "农历 $date $dateSolarFestival",
+                subTitle = "农历 $date",
+                festival = dateSolarFestival,
                 showBackIcon = false,
                 showSearch = true,
                 onSearchClick = {})
