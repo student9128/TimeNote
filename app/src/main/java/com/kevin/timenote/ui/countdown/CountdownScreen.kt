@@ -1,5 +1,10 @@
 package com.kevin.timenote.ui.countdown
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -57,6 +62,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -102,6 +108,17 @@ fun CountdownScreen(
         datePickerState.selectedDateMillis?.let { Solar.fromDate(Date(it)).lunar.toString() } ?: ""
     val isSaveEnabled = state.title.isNotBlank()
     val currentToast = LocalToast.current
+    
+    val context = LocalContext.current
+    var showPermissionDialog by remember { mutableStateOf(false) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.updateState { it.copy(remind = true) }
+        }
+    }
+
     Scaffold(topBar = { TimeTopBar(title = "添加") }) { contentPadding ->
         Box(
             modifier = Modifier
@@ -146,22 +163,6 @@ fun CountdownScreen(
                                     onCheckedChange = null //only read mode
                                 )
                             }
-//                            Checkbox(
-//                                modifier = Modifier.size(20.dp),
-//                                checked = isSelected,
-//                                colors = CheckboxDefaults.colors(
-//                                    checkedColor = Color(model.color), checkmarkColor = Color.White,
-//                                    // 未选中时的边框颜色
-//                                    uncheckedColor =Color(model.color)
-//                                ),
-//                                onCheckedChange = { selectedEventIndex=index} // 当用户点击时更新状态
-//                            )
-//                            Box(
-//                                Modifier
-//                                    .background(Color(model.color), shape = CircleShape)
-//                                    .width(16.dp)
-//                                    .height(16.dp)
-//                            )
                             Text(model.name)
                         }
                     }
@@ -194,7 +195,7 @@ fun CountdownScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = uniformPadding)
+                            .padding(vertical = uniformPadding)
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
@@ -207,7 +208,8 @@ fun CountdownScreen(
                     HorizontalDivider()
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .padding(vertical = uniformPadding),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -230,7 +232,7 @@ fun CountdownScreen(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = uniformPadding),
+                                    .padding(vertical = uniformPadding),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text("农历日")
@@ -256,7 +258,8 @@ fun CountdownScreen(
                     // 提醒开关
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .padding(vertical = uniformPadding),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -265,7 +268,19 @@ fun CountdownScreen(
                             checked = state.remind,
                             modifier = Modifier.scale(0.7f)
                         ) { v ->
-                            viewModel.updateState { it.copy(remind = v) }
+                            if (v) {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                                        viewModel.updateState { it.copy(remind = true) }
+                                    } else {
+                                        showPermissionDialog = true
+                                    }
+                                } else {
+                                    viewModel.updateState { it.copy(remind = true) }
+                                }
+                            } else {
+                                viewModel.updateState { it.copy(remind = false) }
+                            }
                         }
                     }
 
@@ -277,14 +292,14 @@ fun CountdownScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable { repeatMenuExpanded = true }
-                                    .padding(top = uniformPadding)
+                                    .padding(vertical = uniformPadding)
                             ) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text("重复")
+                                    Text("重复提醒")
                                     Text(state.repeatMode.description)
                                 }
 
@@ -352,6 +367,29 @@ fun CountdownScreen(
                         TextButton(onClick = { showDatePicker = false }) { Text("取消") }
                     },
                 ) { DatePicker(state = datePickerState) }
+            }
+            
+            if (showPermissionDialog) {
+                AlertDialog(
+                    onDismissRequest = { showPermissionDialog = false },
+                    title = { Text("开启通知权限") },
+                    text = { Text("开启通知权限后，才能在设定时间收到提醒。") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showPermissionDialog = false
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
+                        }) {
+                            Text("去开启")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showPermissionDialog = false }) {
+                            Text("取消")
+                        }
+                    }
+                )
             }
         }
     }

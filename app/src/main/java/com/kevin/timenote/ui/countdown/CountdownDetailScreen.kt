@@ -1,5 +1,10 @@
 package com.kevin.timenote.ui.countdown
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.SizeTransform
@@ -32,6 +37,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -62,11 +68,13 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kevin.timenote.base.LocalNavController
@@ -111,6 +119,16 @@ fun CountdownDetailScreen(viewModel: CountdownDetailViewModel = hiltViewModel())
             }
         }
     }
+    
+    val context = LocalContext.current
+    var showPermissionDialog by remember { mutableStateOf(false) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.updateState { it.copy(remind = true) }
+        }
+    }
 
     Scaffold(topBar = {
         TimeTopBar(
@@ -148,7 +166,19 @@ fun CountdownDetailScreen(viewModel: CountdownDetailViewModel = hiltViewModel())
                         viewModel.updateRepeatMode(mode)
                     },
                     onRemindChange = { v ->
-                        viewModel.updateState { it.copy(remind = v) }
+                        if (v) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                                    viewModel.updateState { it.copy(remind = true) }
+                                } else {
+                                    showPermissionDialog = true
+                                }
+                            } else {
+                                viewModel.updateState { it.copy(remind = true) }
+                            }
+                        } else {
+                            viewModel.updateState { it.copy(remind = false) }
+                        }
                     }
                 )
             }
@@ -174,6 +204,29 @@ fun CountdownDetailScreen(viewModel: CountdownDetailViewModel = hiltViewModel())
                         TextButton(onClick = { showDatePicker = false }) { Text("取消") }
                     },
                 ) { DatePicker(state = datePickerState) }
+            }
+            
+            if (showPermissionDialog) {
+                AlertDialog(
+                    onDismissRequest = { showPermissionDialog = false },
+                    title = { Text("开启通知权限") },
+                    text = { Text("开启通知权限后，才能在设定时间收到提醒。") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showPermissionDialog = false
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
+                        }) {
+                            Text("去开启")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showPermissionDialog = false }) {
+                            Text("取消")
+                        }
+                    }
+                )
             }
 
         }
@@ -300,6 +353,7 @@ fun CountdownDetailContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(vertical = uniformPadding)
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
@@ -313,7 +367,8 @@ fun CountdownDetailContent(
             HorizontalDivider()
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(vertical = uniformPadding),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -330,10 +385,11 @@ fun CountdownDetailContent(
                     HorizontalDivider()
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .padding(vertical = uniformPadding),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("农历日")
+                        Text("农历日期")
                         Text(model.lunarDate)
                     }
                 }
@@ -369,7 +425,8 @@ fun CountdownDetailContent(
             // 提醒开关
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(vertical = uniformPadding),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -397,7 +454,7 @@ fun CountdownDetailContent(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("重复")
+                            Text("重复提醒")
                             Text(model.repeatMode.description)
                         }
 

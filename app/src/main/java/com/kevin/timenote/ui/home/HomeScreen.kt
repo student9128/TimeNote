@@ -64,8 +64,8 @@ fun HomeScreen(
     val list by viewModel.filteredCountdowns.collectAsStateWithLifecycle()
     val navController = LocalNavController.current
     val date by viewModel.dateLunar.collectAsStateWithLifecycle()
-    val festival by viewModel.dateSolarFestival.collectAsStateWithLifecycle()
     val dateJieQi by viewModel.dateJieQi.collectAsStateWithLifecycle()
+    val dateSolarFestival by viewModel.dateSolarFestival.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
     
     DisposableEffect(lifecycleOwner) {
@@ -80,7 +80,7 @@ fun HomeScreen(
         }
     }
     
-    var selectedTabIndex by remember { mutableIntStateOf(1) }
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf( "今天","未来", "过去", "全部",)
 
     Scaffold(
@@ -91,8 +91,7 @@ fun HomeScreen(
         topBar = {
             TimeTopBar(
                 title = "${System.currentTimeMillis().formatWithPattern("yyyy年MM月dd日")}",
-                subTitle = "农历 $date",
-                festival = festival,
+                subTitle = "农历 $date $dateSolarFestival",
                 showBackIcon = false,
                 showSearch = true,
                 onSearchClick = {})

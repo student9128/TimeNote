@@ -30,6 +30,15 @@ class CountdownUseCase @Inject constructor(
             repository.updateCountdown(model)
         }
     }
+    
+    suspend fun saveAndGetId(model: CountdownModel): Long {
+        return if (model.id == 0L) {
+             repository.addCountdownAndReturnId(model)
+        } else {
+            repository.updateCountdown(model)
+            model.id
+        }
+    }
 
     suspend fun add(model: CountdownModel) =
         repository.addCountdown(model)

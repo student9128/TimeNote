@@ -16,6 +16,10 @@ class CountdownRepositoryImpl @Inject constructor(private val dao: CountdownDao)
         dao.insert(event.toEntity())
     }
 
+    override suspend fun addCountdownAndReturnId(event: CountdownModel): Long {
+        return dao.insert(event.toEntity())
+    }
+
     override suspend fun deleteCountdown(event: CountdownModel) {
         dao.delete(event.toEntity())
     }

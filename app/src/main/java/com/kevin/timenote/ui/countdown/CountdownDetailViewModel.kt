@@ -1,9 +1,11 @@
 package com.kevin.timenote.ui.countdown
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.kevin.timenote.common.util.AlarmUtils
 import com.kevin.timenote.common.util.TimeL
 import com.kevin.timenote.common.util.TimeL.printD
 import com.kevin.timenote.domain.model.CountdownModel
@@ -12,6 +14,7 @@ import com.kevin.timenote.domain.usecase.CountdownUseCase
 import com.kevin.timenote.ui.navigation.TimeRoute
 import com.nlf.calendar.Solar
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CountdownDetailViewModel @Inject constructor(
     private val countdownUseCase: CountdownUseCase,
+    @ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CountdownEditUiState())
@@ -50,7 +54,8 @@ class CountdownDetailViewModel @Inject constructor(
                         isLunar = model.isLunar,
                         eventTypeName = model.eventTypeName,
                         eventTypeColor = model.eventTypeColor,
-                        repeatMode = model.repeatMode
+                        repeatMode = model.repeatMode,
+                        remind = model.remind
                     )
                 }
             }
@@ -91,22 +96,33 @@ class CountdownDetailViewModel @Inject constructor(
     fun save(onFinish: () -> Unit) {
         viewModelScope.launch {
             val s = _uiState.value
-            countdownUseCase.save(
-                CountdownModel(
-                    id = s.id,
-                    title = s.title,
-                    location = s.location,
-                    type = s.type,
-                    startTime = s.startTime,
-                    endTime = s.endTime,
-                    date = s.date,
-                    lunarDate = s.lunarDate,
-                    isLunar = s.isLunar,
-                    eventTypeName = s.eventTypeName,
-                    eventTypeColor = s.eventTypeColor,
-                    repeatMode = s.repeatMode
-                )
+            val model = CountdownModel(
+                id = s.id,
+                title = s.title,
+                location = s.location,
+                type = s.type,
+                startTime = s.startTime,
+                endTime = s.endTime,
+                date = s.date,
+                lunarDate = s.lunarDate,
+                isLunar = s.isLunar,
+                eventTypeName = s.eventTypeName,
+                eventTypeColor = s.eventTypeColor,
+                repeatMode = s.repeatMode,
+                remind = s.remind
             )
+            
+            // For updates, we usually keep the same ID, so we can schedule alarm directly using it.
+            // But if it's new (which shouldn't happen often in Detail screen, but let's be safe),
+            // we should get the ID.
+            
+            // Assuming save logic handles both insert/update.
+            // Since we are in DetailVM, it's likely an update to existing ID.
+            countdownUseCase.save(model)
+            
+            // Schedule/Reschedule Alarm
+            AlarmUtils.scheduleAlarm(context, model)
+            
             onFinish()
         }
     }
@@ -114,22 +130,23 @@ class CountdownDetailViewModel @Inject constructor(
     fun delete(onFinish: () -> Unit) {
         viewModelScope.launch {
             val s = _uiState.value
-            countdownUseCase.delete(
-                CountdownModel(
-                    id = s.id,
-                    title = s.title,
-                    location = s.location,
-                    type = s.type,
-                    startTime = s.startTime,
-                    endTime = s.endTime,
-                    date = s.date,
-                    lunarDate = s.lunarDate,
-                    isLunar = s.isLunar,
-                    eventTypeName = s.eventTypeName,
-                    eventTypeColor = s.eventTypeColor,
-                    repeatMode = s.repeatMode
-                )
+            val model = CountdownModel(
+                id = s.id,
+                title = s.title,
+                location = s.location,
+                type = s.type,
+                startTime = s.startTime,
+                endTime = s.endTime,
+                date = s.date,
+                lunarDate = s.lunarDate,
+                isLunar = s.isLunar,
+                eventTypeName = s.eventTypeName,
+                eventTypeColor = s.eventTypeColor,
+                repeatMode = s.repeatMode,
+                remind = s.remind
             )
+            countdownUseCase.delete(model)
+            AlarmUtils.cancelAlarm(context, s.id)
             onFinish()
         }
     }

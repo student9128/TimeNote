@@ -34,7 +34,7 @@ class HomeViewModel @Inject constructor(
     private val _dateJieQi = MutableStateFlow("")
     val dateJieQi = _dateJieQi.asStateFlow()
 
-    private val _filterType = MutableStateFlow(1) // 0: 今天, 1: 未来, 2: 过去, 3: 全部
+    private val _filterType = MutableStateFlow(0) // 0: 今天, 1: 未来, 2: 过去, 3: 全部
 //  本地筛选
 private val _allCountdowns = countdownUseCase.observeCountdowns()
     .stateIn(

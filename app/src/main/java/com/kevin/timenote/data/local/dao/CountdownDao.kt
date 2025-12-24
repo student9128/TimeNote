@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 interface CountdownDao {
 
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
-    suspend fun insert(entity: CountdownEntity)
+    suspend fun insert(entity: CountdownEntity): Long
 
     @Delete
     suspend fun delete(entity: CountdownEntity)

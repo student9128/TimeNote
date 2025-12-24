@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 interface CountdownRepository {
 
     suspend fun addCountdown(event: CountdownModel)
+    
+    suspend fun addCountdownAndReturnId(event: CountdownModel): Long
 
     suspend fun deleteCountdown(event: CountdownModel)
 
