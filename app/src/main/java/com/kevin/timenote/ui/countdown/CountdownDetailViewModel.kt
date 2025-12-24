@@ -7,6 +7,7 @@ import androidx.navigation.toRoute
 import com.kevin.timenote.common.util.TimeL
 import com.kevin.timenote.common.util.TimeL.printD
 import com.kevin.timenote.domain.model.CountdownModel
+import com.kevin.timenote.domain.model.RepeatMode
 import com.kevin.timenote.domain.usecase.CountdownUseCase
 import com.kevin.timenote.ui.navigation.TimeRoute
 import com.nlf.calendar.Solar
@@ -48,7 +49,8 @@ class CountdownDetailViewModel @Inject constructor(
                         lunarDate = model.lunarDate,
                         isLunar = model.isLunar,
                         eventTypeName = model.eventTypeName,
-                        eventTypeColor = model.eventTypeColor
+                        eventTypeColor = model.eventTypeColor,
+                        repeatMode = model.repeatMode
                     )
                 }
             }
@@ -81,6 +83,10 @@ class CountdownDetailViewModel @Inject constructor(
         // 使用 .update 保证并发更新时的原子性 (Atomic)
         _uiState.update { transform(it) }
     }
+    
+    fun updateRepeatMode(repeatMode: RepeatMode) {
+        _uiState.update { it.copy(repeatMode = repeatMode) }
+    }
 
     fun save(onFinish: () -> Unit) {
         viewModelScope.launch {
@@ -97,7 +103,8 @@ class CountdownDetailViewModel @Inject constructor(
                     lunarDate = s.lunarDate,
                     isLunar = s.isLunar,
                     eventTypeName = s.eventTypeName,
-                    eventTypeColor = s.eventTypeColor
+                    eventTypeColor = s.eventTypeColor,
+                    repeatMode = s.repeatMode
                 )
             )
             onFinish()
@@ -119,7 +126,8 @@ class CountdownDetailViewModel @Inject constructor(
                     lunarDate = s.lunarDate,
                     isLunar = s.isLunar,
                     eventTypeName = s.eventTypeName,
-                    eventTypeColor = s.eventTypeColor
+                    eventTypeColor = s.eventTypeColor,
+                    repeatMode = s.repeatMode
                 )
             )
             onFinish()

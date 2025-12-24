@@ -37,6 +37,8 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
@@ -139,7 +141,11 @@ fun CountdownDetailScreen(viewModel: CountdownDetailViewModel = hiltViewModel())
                                 lunarDate = lunarDate
                             )
                         }
-                    })
+                    },
+                    onRepeatModeChange = { mode ->
+                        viewModel.updateRepeatMode(mode)
+                    }
+                )
             }
             if (showDatePicker) {
                 val confirmEnabled = remember {
@@ -178,10 +184,12 @@ fun CountdownDetailContent(
     onDateClick: () -> Unit,
     onUpdateClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    onUseLunarClick: (b: Boolean) -> Unit
+    onUseLunarClick: (b: Boolean) -> Unit,
+    onRepeatModeChange: (com.kevin.timenote.domain.model.RepeatMode) -> Unit
 ) {
     // 1. 定义一个状态来保存剩余的总秒数
     var remainingTime by remember { mutableLongStateOf(0L) }
+    var repeatMenuExpanded by remember { mutableStateOf(false) }
     val targetMillis = model.date // 数据库存的时间戳
 //    var useLunar =model.isLunar
 // 3. 将总秒数拆分为天、时、分、秒
@@ -326,6 +334,46 @@ fun CountdownDetailContent(
                 Text("使用农历")
             }
         }
+
+        Spacer(Modifier.height(spaceHeight10))
+        
+        // 重复提醒设置
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    MaterialTheme.colorScheme.onPrimary, shape = RoundedCornerShape(
+                        cornerCard
+                    )
+                )
+                .clickable { repeatMenuExpanded = true }
+                .padding(uniformPadding)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("重复提醒")
+                Text(model.repeatMode.description)
+            }
+            
+            DropdownMenu(
+                expanded = repeatMenuExpanded,
+                onDismissRequest = { repeatMenuExpanded = false }
+            ) {
+                com.kevin.timenote.domain.model.RepeatMode.values().forEach { mode ->
+                    DropdownMenuItem(
+                        text = { Text(mode.description) },
+                        onClick = {
+                            onRepeatModeChange(mode)
+                            repeatMenuExpanded = false
+                        }
+                    )
+                }
+            }
+        }
+
         Spacer(Modifier.height(spaceHeight20))
         Row {
             Button(

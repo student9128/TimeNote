@@ -31,6 +31,8 @@ import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
@@ -61,6 +63,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kevin.timenote.base.LocalNavController
 import com.kevin.timenote.base.LocalToast
+import com.kevin.timenote.domain.model.RepeatMode
 import com.kevin.timenote.ui.theme.AppTextFieldColors
 import com.kevin.timenote.ui.theme.TimeNoteTheme
 import com.kevin.timenote.ui.theme.cornerCard
@@ -86,6 +89,7 @@ fun CountdownScreen(
     var selectedEventIndex by remember { mutableStateOf(0) }
     var showDatePicker by remember { mutableStateOf(false) }
     var useLunar by remember { mutableStateOf(false) }
+    var repeatMenuExpanded by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = System.currentTimeMillis()
     )
@@ -224,6 +228,44 @@ fun CountdownScreen(
                     }
                 }
 
+                Spacer(Modifier.height(spaceHeight10))
+                
+                // 重复提醒设置
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            MaterialTheme.colorScheme.onPrimary, shape = RoundedCornerShape(
+                                cornerCard
+                            )
+                        )
+                        .clickable { repeatMenuExpanded = true }
+                        .padding(uniformPadding)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("重复提醒")
+                        Text(state.repeatMode.description)
+                    }
+                    
+                    DropdownMenu(
+                        expanded = repeatMenuExpanded,
+                        onDismissRequest = { repeatMenuExpanded = false }
+                    ) {
+                        RepeatMode.values().forEach { mode ->
+                            DropdownMenuItem(
+                                text = { Text(mode.description) },
+                                onClick = {
+                                    viewModel.updateRepeatMode(mode)
+                                    repeatMenuExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
 
                 Spacer(Modifier.height(spaceHeight20))
                 Button(modifier = Modifier.fillMaxWidth(), enabled = isSaveEnabled, onClick = {

@@ -25,7 +25,9 @@ object DatabaseModule {
             context,
             TimeAppDatabase::class.java,
             "countdown.db"
-        ).build()
+        )
+        .fallbackToDestructiveMigration()
+        .build()
 
     @Provides
     fun provideDao(db: TimeAppDatabase): CountdownDao =

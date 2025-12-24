@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.google.gson.Gson
+import com.kevin.timenote.domain.model.RepeatMode
 import com.kevin.timenote.domain.usecase.EventTypeUseCase
 import com.nlf.calendar.Solar
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,9 +56,8 @@ class CountdownEditViewModel @Inject constructor(
                 lunarDate = model.lunarDate,
                 isLunar = model.isLunar,
                 eventTypeName = model.eventTypeName,
-                eventTypeColor = model.eventTypeColor
-
-
+                eventTypeColor = model.eventTypeColor,
+                repeatMode = model.repeatMode
             )
         }
         viewModelScope.launch { eventTypeUseCase.initDefaultTypes() }
@@ -80,6 +80,10 @@ class CountdownEditViewModel @Inject constructor(
 
     fun updateEventTypeName(value: String) {
         _uiState.value = _uiState.value.copy(eventTypeName = value)
+    }
+
+    fun updateRepeatMode(value: RepeatMode) {
+        _uiState.value = _uiState.value.copy(repeatMode = value)
     }
 
     // 只保留这一个公开方法
@@ -105,7 +109,8 @@ class CountdownEditViewModel @Inject constructor(
                     lunarDate =s.lunarDate,
                     isLunar = s.isLunar,
                     eventTypeName = s.eventTypeName,
-                    eventTypeColor = s.eventTypeColor
+                    eventTypeColor = s.eventTypeColor,
+                    repeatMode = s.repeatMode
                 )
             )
             onFinish()
@@ -127,11 +132,11 @@ class CountdownEditViewModel @Inject constructor(
                     lunarDate = s.lunarDate,
                     isLunar = s.isLunar,
                     eventTypeName = s.eventTypeName,
-                    eventTypeColor = s.eventTypeColor
+                    eventTypeColor = s.eventTypeColor,
+                    repeatMode = s.repeatMode
                 )
             )
             onFinish()
         }
     }
 }
-

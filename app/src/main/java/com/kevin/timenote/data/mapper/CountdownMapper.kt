@@ -12,10 +12,11 @@ fun CountdownEntity.toDomain(): CountdownModel =
         startTime = startTime,
         endTime = endTime,
         date = date,
-        lunarDate=lunarDate,
+        lunarDate = lunarDate,
         isLunar = isLunar,
-        eventTypeName=eventTypeName,
-        eventTypeColor=eventTypeColor
+        eventTypeName = eventTypeName,
+        eventTypeColor = eventTypeColor,
+        repeatMode = repeatMode
     )
 
 fun CountdownModel.toEntity(): CountdownEntity =
@@ -27,8 +28,9 @@ fun CountdownModel.toEntity(): CountdownEntity =
         startTime = startTime,
         endTime = endTime,
         date = date,
-        lunarDate=lunarDate,
+        lunarDate = lunarDate,
         isLunar = isLunar,
-        eventTypeName=eventTypeName,
-        eventTypeColor=eventTypeColor
+        eventTypeName = eventTypeName,
+        eventTypeColor = eventTypeColor,
+        repeatMode = repeatMode
     )

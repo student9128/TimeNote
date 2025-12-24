@@ -1,5 +1,6 @@
 package com.kevin.timenote.ui.countdown
 
+import com.kevin.timenote.domain.model.RepeatMode
 import com.kevin.timenote.ui.theme.eventDefaultColor
 
 data class CountdownEditUiState(
@@ -13,7 +14,8 @@ data class CountdownEditUiState(
     val lunarDate: String="",
     val isLunar: Boolean = false,
     val eventTypeName: String = "倒数日", // 事件类型名称，提供默认值
-    val eventTypeColor: Long = eventDefaultColor
+    val eventTypeColor: Long = eventDefaultColor,
+    val repeatMode: RepeatMode = RepeatMode.NONE
 ) {
     val isEditMode: Boolean get() = id != 0L
 }

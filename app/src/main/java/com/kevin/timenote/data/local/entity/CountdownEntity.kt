@@ -2,6 +2,7 @@ package com.kevin.timenote.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.kevin.timenote.domain.model.RepeatMode
 
 @Entity(tableName = "countdown")
 data class CountdownEntity(
@@ -16,5 +17,6 @@ data class CountdownEntity(
     val lunarDate: String,
     val isLunar: Boolean,
     val eventTypeName: String, // 事件类型名称，提供默认值
-    val eventTypeColor: Long
+    val eventTypeColor: Long,
+    val repeatMode: RepeatMode = RepeatMode.NONE
 )
