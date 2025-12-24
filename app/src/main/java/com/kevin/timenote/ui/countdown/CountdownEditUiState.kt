@@ -15,7 +15,8 @@ data class CountdownEditUiState(
     val isLunar: Boolean = false,
     val eventTypeName: String = "倒数日", // 事件类型名称，提供默认值
     val eventTypeColor: Long = eventDefaultColor,
-    val repeatMode: RepeatMode = RepeatMode.NONE
+    val repeatMode: RepeatMode = RepeatMode.ONCE,
+    val remind: Boolean = false
 ) {
     val isEditMode: Boolean get() = id != 0L
 }

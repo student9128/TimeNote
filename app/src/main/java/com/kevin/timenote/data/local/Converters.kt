@@ -14,7 +14,7 @@ class Converters {
         return try {
             RepeatMode.valueOf(value)
         } catch (e: Exception) {
-            RepeatMode.NONE
+            RepeatMode.ONCE
         }
     }
 }

@@ -79,7 +79,7 @@ private val _allCountdowns = countdownUseCase.observeCountdowns()
 
     fun refreshDate() {
         val today: LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        val todayYmd = Solar.fromYmd(today.year, today.month.number, today.day)
+        val todayYmd = Solar.fromYmd(today.year, today.month.number, today.dayOfMonth)
         val festival = todayYmd.festivals.firstOrNull()
         if(festival!=null){
             _dateSolarFestival.value=festival

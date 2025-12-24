@@ -18,5 +18,6 @@ data class CountdownEntity(
     val isLunar: Boolean,
     val eventTypeName: String, // 事件类型名称，提供默认值
     val eventTypeColor: Long,
-    val repeatMode: RepeatMode = RepeatMode.NONE
+    val repeatMode: RepeatMode = RepeatMode.ONCE,
+    val remind: Boolean = false
 )

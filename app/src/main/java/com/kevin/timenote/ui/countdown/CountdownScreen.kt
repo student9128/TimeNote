@@ -194,7 +194,7 @@ fun CountdownScreen(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = uniformPadding)
+                            .padding(bottom = uniformPadding)
                             .clickable(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
@@ -207,20 +207,19 @@ fun CountdownScreen(
                     HorizontalDivider()
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = uniformPadding),
+                            .fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text("农历")
-                        TimeSwitch(modifier = Modifier.scale(0.7f)) { v ->
+                        TimeSwitch(checked = useLunar, modifier = Modifier.scale(0.7f)) { v ->
                             useLunar = v
                             viewModel.updateState {
-                            it.copy(
-                                isLunar = v,
-                                lunarDate = lunarDate
-                            )
-                        }
+                                it.copy(
+                                    isLunar = v,
+                                    lunarDate = lunarDate
+                                )
+                            }
                         }
                     }
                     AnimatedVisibility(visible = useLunar) {
@@ -231,7 +230,7 @@ fun CountdownScreen(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = uniformPadding),
+                                    .padding(top = uniformPadding),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text("农历日")
@@ -244,7 +243,7 @@ fun CountdownScreen(
                 Spacer(Modifier.height(spaceHeight10))
 
                 // 重复提醒设置
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
@@ -252,30 +251,58 @@ fun CountdownScreen(
                                 cornerCard
                             )
                         )
-                        .clickable { repeatMenuExpanded = true }
                         .padding(uniformPadding)
                 ) {
+                    // 提醒开关
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("重复提醒")
-                        Text(state.repeatMode.description)
+                        Text("提醒")
+                        TimeSwitch(
+                            checked = state.remind,
+                            modifier = Modifier.scale(0.7f)
+                        ) { v ->
+                            viewModel.updateState { it.copy(remind = v) }
+                        }
                     }
 
-                    DropdownMenu(
-                        expanded = repeatMenuExpanded,
-                        onDismissRequest = { repeatMenuExpanded = false }
-                    ) {
-                        RepeatMode.values().forEach { mode ->
-                            DropdownMenuItem(
-                                text = { Text(mode.description) },
-                                onClick = {
-                                    viewModel.updateRepeatMode(mode)
-                                    repeatMenuExpanded = false
+                    // 只有当提醒打开时才显示重复设置
+                    AnimatedVisibility(visible = state.remind) {
+                        Column {
+                            HorizontalDivider()
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { repeatMenuExpanded = true }
+                                    .padding(top = uniformPadding)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text("重复")
+                                    Text(state.repeatMode.description)
                                 }
-                            )
+
+                                DropdownMenu(
+                                    expanded = repeatMenuExpanded,
+                                    onDismissRequest = { repeatMenuExpanded = false }
+                                ) {
+                                    RepeatMode.values().forEach { mode ->
+                                        DropdownMenuItem(
+                                            text = { Text(mode.description) },
+                                            onClick = {
+                                                viewModel.updateRepeatMode(mode)
+                                                repeatMenuExpanded = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -314,10 +341,7 @@ fun CountdownScreen(
                             showDatePicker = false
                             datePickerState.selectedDateMillis?.let { date ->
                                 viewModel.updateState {
-                                    it.copy(
-                                        date = date,
-                                        lunarDate = lunarDate
-                                    )
+                                    it.copy(date = date, lunarDate = lunarDate)
                                 }
                             }
                         }, enabled = confirmEnabled.value) {
