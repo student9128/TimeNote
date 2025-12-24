@@ -55,6 +55,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -72,6 +73,7 @@ import com.kevin.timenote.ui.theme.spaceHeight
 import com.kevin.timenote.ui.theme.spaceHeight10
 import com.kevin.timenote.ui.theme.spaceHeight20
 import com.kevin.timenote.ui.theme.uniformPadding
+import com.kevin.timenote.ui.widget.TimeSwitch
 import com.kevin.timenote.ui.widget.TimeTopBar
 import com.nlf.calendar.Solar
 import java.text.SimpleDateFormat
@@ -124,7 +126,12 @@ fun CountdownScreen(
                             ) {
                                 selectedEventIndex = index
 //                                viewModel.updateEventTypeName(model.name)
-                                viewModel.updateState { it.copy(eventTypeName = model.name, eventTypeColor = model.color) }
+                                viewModel.updateState {
+                                    it.copy(
+                                        eventTypeName = model.name,
+                                        eventTypeColor = model.color
+                                    )
+                                }
                             }
                         ) {
                             CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 20.dp) {
@@ -182,7 +189,7 @@ fun CountdownScreen(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
-                        ) { showDatePicker=true },
+                        ) { showDatePicker = true },
                 ) {
                     Row(
                         modifier = Modifier
@@ -197,6 +204,25 @@ fun CountdownScreen(
                         Text("目标日")
                         Text(selectedDate)
                     }
+                    HorizontalDivider()
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = uniformPadding),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("农历")
+                        TimeSwitch(modifier = Modifier.scale(0.7f)) { v ->
+                            useLunar = v
+                            viewModel.updateState {
+                            it.copy(
+                                isLunar = v,
+                                lunarDate = lunarDate
+                            )
+                        }
+                        }
+                    }
                     AnimatedVisibility(visible = useLunar) {
                         // 因为 AnimatedVisibility 内部只能有一个直接子组件（或者需要 Column 包裹），
                         // 这里我们将 Divider 和 Row 包裹在一个 Column 中
@@ -208,28 +234,15 @@ fun CountdownScreen(
                                     .padding(vertical = uniformPadding),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("农历日期")
+                                Text("农历日")
                                 Text(lunarDate)
                             }
                         }
                     }
                 }
-                Spacer(Modifier.height(spaceHeight10))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 20.dp) {
-                        Checkbox(
-                            checked = useLunar,
-                            onCheckedChange = { v ->
-                                useLunar = v
-                                viewModel.updateState { it.copy(isLunar = v, lunarDate = lunarDate) }
-                            }
-                        )
-                        Text("使用农历")
-                    }
-                }
 
                 Spacer(Modifier.height(spaceHeight10))
-                
+
                 // 重复提醒设置
                 Box(
                     modifier = Modifier
@@ -250,7 +263,7 @@ fun CountdownScreen(
                         Text("重复提醒")
                         Text(state.repeatMode.description)
                     }
-                    
+
                     DropdownMenu(
                         expanded = repeatMenuExpanded,
                         onDismissRequest = { repeatMenuExpanded = false }
@@ -299,7 +312,14 @@ fun CountdownScreen(
                     confirmButton = {
                         TextButton(onClick = {
                             showDatePicker = false
-                            datePickerState.selectedDateMillis?.let {date-> viewModel.updateState{it.copy(date=date, lunarDate = lunarDate)} }
+                            datePickerState.selectedDateMillis?.let { date ->
+                                viewModel.updateState {
+                                    it.copy(
+                                        date = date,
+                                        lunarDate = lunarDate
+                                    )
+                                }
+                            }
                         }, enabled = confirmEnabled.value) {
                             Text("确定")
                         }

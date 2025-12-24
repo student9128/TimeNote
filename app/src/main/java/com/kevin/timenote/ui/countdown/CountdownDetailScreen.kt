@@ -59,6 +59,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontFamily
@@ -78,6 +79,7 @@ import com.kevin.timenote.ui.theme.cornerCard
 import com.kevin.timenote.ui.theme.spaceHeight10
 import com.kevin.timenote.ui.theme.spaceHeight20
 import com.kevin.timenote.ui.theme.uniformPadding
+import com.kevin.timenote.ui.widget.TimeSwitch
 import com.kevin.timenote.ui.widget.TimeTopBar
 import com.nlf.calendar.Solar
 import kotlinx.coroutines.delay
@@ -304,6 +306,21 @@ fun CountdownDetailContent(
                 Text("目标日")
                 Text(selectedDate)
             }
+
+            HorizontalDivider()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = uniformPadding),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("农历")
+                TimeSwitch(checked = model.isLunar, modifier = Modifier.scale(0.7f)) { v ->
+                   onUseLunarClick(v)
+                }
+            }
+
             AnimatedVisibility(visible = model.isLunar) {
                 // 因为 AnimatedVisibility 内部只能有一个直接子组件（或者需要 Column 包裹），
                 // 这里我们将 Divider 和 Row 包裹在一个 Column 中
@@ -321,19 +338,19 @@ fun CountdownDetailContent(
                 }
             }
         }
-        Spacer(Modifier.height(spaceHeight10))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 20.dp) {
-                Checkbox(
-                    checked = model.isLunar,
-                    onCheckedChange = { v ->
-//                        useLunar = v
-                        onUseLunarClick(v)
-                    }
-                )
-                Text("使用农历")
-            }
-        }
+//        Spacer(Modifier.height(spaceHeight10))
+//        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+//            CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 20.dp) {
+//                Checkbox(
+//                    checked = model.isLunar,
+//                    onCheckedChange = { v ->
+////                        useLunar = v
+//                        onUseLunarClick(v)
+//                    }
+//                )
+//                Text("使用农历")
+//            }
+//        }
 
         Spacer(Modifier.height(spaceHeight10))
         
