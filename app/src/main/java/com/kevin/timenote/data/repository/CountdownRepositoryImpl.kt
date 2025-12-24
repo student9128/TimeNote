@@ -32,4 +32,19 @@ class CountdownRepositoryImpl @Inject constructor(private val dao: CountdownDao)
         return dao.observeAll()
             .map { list -> list.map { it.toDomain() } }
     }
+
+    override fun observeByDateRange(start: Long, end: Long): Flow<List<CountdownModel>> {
+        return dao.observeByDateRange(start, end)
+            .map { list -> list.map { it.toDomain() } }
+    }
+
+    override fun observePast(time: Long): Flow<List<CountdownModel>> {
+        return dao.observePast(time)
+            .map { list -> list.map { it.toDomain() } }
+    }
+
+    override fun observeFuture(time: Long): Flow<List<CountdownModel>> {
+        return dao.observeFuture(time)
+            .map { list -> list.map { it.toDomain() } }
+    }
 }

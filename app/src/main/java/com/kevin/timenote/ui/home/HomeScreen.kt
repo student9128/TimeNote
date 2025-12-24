@@ -23,11 +23,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -51,14 +56,14 @@ import okhttp3.Route
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val list by viewModel.countdowns.collectAsState()
+    val list by viewModel.filteredCountdowns.collectAsStateWithLifecycle()
     val navController = LocalNavController.current
     val date by viewModel.dateLunar.collectAsStateWithLifecycle()
     val dateJieQi by viewModel.dateJieQi.collectAsStateWithLifecycle()
-    LaunchedEffect("") {
+    
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val tabs = listOf("全部", "今天", "过去", "未来")
 
-    }
-//
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -71,19 +76,9 @@ fun HomeScreen(
                 showBackIcon = false,
                 showSearch = true,
                 onSearchClick = {})
-//        TopAppBar(
-//            colors = TopAppBarDefaults.topAppBarColors(
-//                containerColor = MaterialTheme.colorScheme.primaryContainer,
-//                titleContentColor = MaterialTheme.colorScheme.primary,
-//            ),
-//            title = {
-//                Text("Small Top App Bar")
-//            }
-//        )
         }, floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(TimeRoute.Countdown) },
-//                modifier = Modifier.padding(bottom = 80.dp)
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -98,8 +93,21 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
+            TabRow(selectedTabIndex = selectedTabIndex) {
+                tabs.forEachIndexed { index, title ->
+                    Tab(
+                        selected = selectedTabIndex == index,
+                        onClick = {
+                            selectedTabIndex = index
+                            viewModel.updateFilter(index)
+                        },
+                        text = { Text(text = title) }
+                    )
+                }
+            }
+
             if (list.isNotEmpty()) {
                 LazyColumn(
                     modifier = Modifier
@@ -115,13 +123,20 @@ fun HomeScreen(
                     }
                 }
             } else {
-                Text(
-                    "暂无添加任何事项\n点右下角+快去添加吧",
-                    textAlign = TextAlign.Center,
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        "暂无添加任何事项\n点右下角+快去添加吧",
+                        textAlign = TextAlign.Center,
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
     }

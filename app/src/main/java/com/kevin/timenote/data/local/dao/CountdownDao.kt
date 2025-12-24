@@ -27,4 +27,13 @@ interface CountdownDao {
 
     @Query("SELECT * FROM countdown WHERE id = :id")
     fun getCountdownById(id: Long): Flow<CountdownModel>
+
+    @Query("SELECT * FROM countdown WHERE date >= :start AND date <= :end ORDER BY date ASC")
+    fun observeByDateRange(start: Long, end: Long): Flow<List<CountdownEntity>>
+
+    @Query("SELECT * FROM countdown WHERE date < :time ORDER BY date DESC")
+    fun observePast(time: Long): Flow<List<CountdownEntity>>
+
+    @Query("SELECT * FROM countdown WHERE date > :time ORDER BY date ASC")
+    fun observeFuture(time: Long): Flow<List<CountdownEntity>>
 }

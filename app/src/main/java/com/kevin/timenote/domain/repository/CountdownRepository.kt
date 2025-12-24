@@ -14,4 +14,10 @@ interface CountdownRepository {
     fun getCountdownById(id: Long): Flow<CountdownModel>
 
     fun observeCountdowns(): Flow<List<CountdownModel>>
+
+    fun observeByDateRange(start: Long, end: Long): Flow<List<CountdownModel>>
+
+    fun observePast(time: Long): Flow<List<CountdownModel>>
+
+    fun observeFuture(time: Long): Flow<List<CountdownModel>>
 }
