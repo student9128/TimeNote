@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.google.gson.Gson
+import com.kevin.timenote.TimeGlanceWidget
 import com.kevin.timenote.domain.model.RepeatMode
 import com.kevin.timenote.domain.usecase.EventTypeUseCase
 import com.nlf.calendar.Solar
@@ -98,7 +100,6 @@ class CountdownEditViewModel @Inject constructor(
     }
 
 
-
     fun save(onFinish: () -> Unit) {
         viewModelScope.launch {
             val s = _uiState.value
@@ -121,16 +122,16 @@ class CountdownEditViewModel @Inject constructor(
             // But since we are saving via UseCase which might not return ID directly for update,
             // we should handle Insert vs Update logic.
             // Assuming save handles id=0 as insert.
-            
+
             // For alarm scheduling, we need the ID.
             // If it's a new item (id=0), we need to get the generated ID.
             // The current usecase.save might need to be adjusted to return ID.
             val savedId = countdownUseCase.saveAndGetId(model)
-            
+
             // Schedule Alarm
             val savedModel = model.copy(id = savedId)
             AlarmUtils.scheduleAlarm(context, savedModel)
-
+            refreshWidgets()
             onFinish()
         }
     }
@@ -156,6 +157,13 @@ class CountdownEditViewModel @Inject constructor(
             countdownUseCase.delete(model)
             AlarmUtils.cancelAlarm(context, s.id)
             onFinish()
+        }
+    }
+
+    private suspend fun refreshWidgets() {
+        val manager = GlanceAppWidgetManager(context)
+        manager.getGlanceIds(TimeGlanceWidget::class.java).forEach { id ->
+            TimeGlanceWidget().update(context, id)
         }
     }
 }

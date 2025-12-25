@@ -59,6 +59,10 @@ fun AppNavHost(
                 }
             )
         ) { CountdownScreen() }
-        composable<TimeRoute.CountdownDetail> { CountdownDetailScreen() }
+        composable<TimeRoute.CountdownDetail>(
+            deepLinks = listOf(
+                navDeepLink<TimeRoute.CountdownDetail>(basePath = "timenote://detail")
+            )
+        ) { CountdownDetailScreen() }
     }
 }

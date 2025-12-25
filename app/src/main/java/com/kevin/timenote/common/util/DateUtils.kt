@@ -14,6 +14,7 @@ import kotlinx.datetime.toJavaLocalDateTime
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.todayIn
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.Locale
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -169,4 +170,14 @@ fun convertDateFormat(
  */
 fun String.reformatDate(from: String, to: String): String {
     return convertDateFormat(this, from, to)
+}
+
+fun Long.getStartOfDay(): Long {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = this
+    calendar.set(Calendar.HOUR_OF_DAY, 0)
+    calendar.set(Calendar.MINUTE, 0)
+    calendar.set(Calendar.SECOND, 0)
+    calendar.set(Calendar.MILLISECOND, 0)
+    return calendar.timeInMillis
 }

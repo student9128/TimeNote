@@ -38,6 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.kevin.timenote.ui.navigation.AppNavHost
@@ -50,6 +51,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private lateinit var navController: NavHostController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -72,7 +74,7 @@ class MainActivity : ComponentActivity() {
             TimeNoteTheme(
                 darkTheme = isDarkTheme,
                 dynamicColor = isDynamicColor) {
-                val navController = rememberNavController()
+                navController = rememberNavController()
                 val startDestination = TimeRoute.Home
                 val currentEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = currentEntry?.destination?.route
@@ -251,7 +253,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
         super.onNewIntent(intent, caller)
-        setIntent(intent)
+//        setIntent(intent)
+        navController.handleDeepLink(intent)
     }
 }
 

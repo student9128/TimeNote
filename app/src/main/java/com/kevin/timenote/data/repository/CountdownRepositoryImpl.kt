@@ -1,6 +1,7 @@
 package com.kevin.timenote.data.repository
 
 import com.kevin.timenote.data.local.dao.CountdownDao
+import com.kevin.timenote.data.local.entity.CountdownEntity
 import com.kevin.timenote.data.mapper.toDomain
 import com.kevin.timenote.data.mapper.toEntity
 import com.kevin.timenote.domain.model.CountdownModel
@@ -29,7 +30,7 @@ class CountdownRepositoryImpl @Inject constructor(private val dao: CountdownDao)
     }
 
     override fun getCountdownById(id: Long): Flow<CountdownModel> {
-       return dao.getCountdownById(id)
+        return dao.getCountdownById(id)
     }
 
     override fun observeCountdowns(): Flow<List<CountdownModel>> {
@@ -50,5 +51,12 @@ class CountdownRepositoryImpl @Inject constructor(private val dao: CountdownDao)
     override fun observeFuture(time: Long): Flow<List<CountdownModel>> {
         return dao.observeFuture(time)
             .map { list -> list.map { it.toDomain() } }
+    }
+
+    override fun observeUpcoming(
+        todayStart: Long,
+        limit: Int
+    ): Flow<List<CountdownModel>> {
+        return dao.observeUpcoming(todayStart, limit).map { list -> list.map { it.toDomain() } }
     }
 }

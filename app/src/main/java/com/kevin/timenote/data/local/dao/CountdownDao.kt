@@ -36,4 +36,7 @@ interface CountdownDao {
 
     @Query("SELECT * FROM countdown WHERE date > :time ORDER BY date ASC")
     fun observeFuture(time: Long): Flow<List<CountdownEntity>>
+
+    @Query("SELECT * FROM countdown WHERE date >= :todayStart ORDER BY date ASC LIMIT :limit")
+    fun observeUpcoming(todayStart: Long,limit: Int): Flow<List<CountdownEntity>>
 }
