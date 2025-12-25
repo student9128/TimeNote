@@ -59,7 +59,7 @@
         <receiver
             android:name=".TimeWidgetReceiver"
             android:exported="true"
-            android:label="Glance示例">
+            android:label="TimeNote">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
