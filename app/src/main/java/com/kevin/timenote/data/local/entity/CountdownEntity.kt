@@ -19,5 +19,5 @@ data class CountdownEntity(
     val eventTypeName: String, // 事件类型名称，提供默认值
     val eventTypeColor: Long,
     val repeatMode: RepeatMode = RepeatMode.ONCE,
-    val remind: Boolean = false
+    val remind: Boolean
 )

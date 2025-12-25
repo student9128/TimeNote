@@ -16,7 +16,8 @@ fun CountdownEntity.toDomain(): CountdownModel =
         isLunar = isLunar,
         eventTypeName = eventTypeName,
         eventTypeColor = eventTypeColor,
-        repeatMode = repeatMode
+        repeatMode = repeatMode,
+        remind=remind
     )
 
 fun CountdownModel.toEntity(): CountdownEntity =
@@ -32,5 +33,6 @@ fun CountdownModel.toEntity(): CountdownEntity =
         isLunar = isLunar,
         eventTypeName = eventTypeName,
         eventTypeColor = eventTypeColor,
-        repeatMode = repeatMode
+        repeatMode = repeatMode,
+        remind=remind
     )

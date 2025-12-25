@@ -163,7 +163,7 @@ fun CountdownDetailScreen(viewModel: CountdownDetailViewModel = hiltViewModel())
                         }
                     },
                     onRepeatModeChange = { mode ->
-                        viewModel.updateRepeatMode(mode)
+                        viewModel.updateState { it.copy(repeatMode = mode) }
                     },
                     onRemindChange = { v ->
                         if (v) {
