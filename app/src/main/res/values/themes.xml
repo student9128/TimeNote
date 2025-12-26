@@ -2,4 +2,19 @@
 <resources>
 
     <style name="Theme.TimeNote" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <!-- Set the splash screen background to black -->
+        <item name="windowSplashScreenBackground">@android:color/transparent</item>
+        <!-- Use windowSplashScreenAnimatedIcon to add a drawable or an animated
+             drawable. -->
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+        <!-- Set the theme of the Activity that follows your splash screen. -->
+        <item name="postSplashScreenTheme">@style/Theme.TimeNote</item>
+        <item name="windowSplashScreenAnimationDuration">0</item>
+        <!--        <item name="android:windowBackground">@drawable/ic_welcome</item>-->
+        <item name="android:windowFullscreen">true</item>
+        <!--    添加透明色，开屏页不在显示白色    -->
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
 </resources>

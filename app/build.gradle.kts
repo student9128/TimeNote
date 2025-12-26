@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.core.splashscreen)
     ksp(libs.androidx.room.compiler)
     implementation("com.google.dagger:hilt-android:2.57.1")
     ksp("com.google.dagger:hilt-android-compiler:2.57.1")

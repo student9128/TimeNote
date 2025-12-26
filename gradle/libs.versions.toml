@@ -21,6 +21,7 @@ ksp="2.2.0-2.0.2"
 hiltAndroid ="2.57.1"
 lunarCalendar="1.7.1"
 kotlinSerialization="2.0.21"
+coreSplashscreen = "1.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,6 +48,7 @@ androidx-room-runtime = { group = "androidx.room", name = "room-runtime", versio
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 lunar={group="cn.6tail",name="lunar",version.ref="lunarCalendar"}
+androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "coreSplashscreen" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -3,7 +3,7 @@
     <shortcut
         android:shortcutId="add_event"
         android:enabled="true"
-        android:icon="@drawable/ic_launcher_foreground"
+        android:icon="@mipmap/ic_logo"
         android:shortcutShortLabel="@string/shortcut_add_event_short"
         android:shortcutLongLabel="@string/shortcut_add_event_long">
         <intent

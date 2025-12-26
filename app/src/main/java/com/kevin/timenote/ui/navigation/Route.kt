@@ -10,6 +10,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class TimeRoute {
     @Serializable
+    object Welcome
+    @Serializable
     object Home
 
     @Serializable

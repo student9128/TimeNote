@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.kevin.timenote.ui.WelcomeScreen
 import com.kevin.timenote.ui.countdown.CountdownDetailScreen
 import com.kevin.timenote.ui.countdown.CountdownScreen
 import com.kevin.timenote.ui.home.HomeScreen
@@ -42,6 +43,7 @@ fun AppNavHost(
         navController,
         startDestination = startDestination
     ) {
+        composable<TimeRoute.Welcome> { WelcomeScreen() }
         composable<TimeRoute.Home> { HomeScreen() }
         composable<TimeRoute.Mine> { MineScreen() }
 //        Destination.entries.forEach { destination ->

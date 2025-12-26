@@ -34,8 +34,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -48,13 +50,24 @@ import com.kevin.timenote.ui.countdown.CountdownScreen
 import com.kevin.timenote.ui.navigation.TimeRoute
 import com.kevin.timenote.ui.theme.TimeNoteTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
+    var isReady = false
     override fun onCreate(savedInstanceState: Bundle?) {
+        val splashScreen = installSplashScreen()
+        splashScreen.setKeepOnScreenCondition {
+            false
+        }
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+//        lifecycleScope.launch {
+//            delay(2000)
+//            isReady=true
+//        }
         setContent {
             val mainViewModel: MainViewModel = hiltViewModel()
             // 监听主题变化
@@ -75,7 +88,7 @@ class MainActivity : ComponentActivity() {
                 darkTheme = isDarkTheme,
                 dynamicColor = isDynamicColor) {
                 navController = rememberNavController()
-                val startDestination = TimeRoute.Home
+                val startDestination = TimeRoute.Welcome
                 val currentEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = currentEntry?.destination?.route
                 val showBottomBar = currentRoute == TimeRoute.Home::class.qualifiedName ||
