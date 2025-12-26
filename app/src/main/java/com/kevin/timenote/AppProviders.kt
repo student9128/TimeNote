@@ -3,6 +3,8 @@ package com.kevin.timenote
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -23,8 +25,9 @@ import com.kevin.timenote.ui.widget.LoadingWidget
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppProviders(navController: NavController,content: @Composable () -> Unit) {
+fun AppProviders(navController: NavController, content: @Composable () -> Unit) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -50,7 +53,8 @@ fun AppProviders(navController: NavController,content: @Composable () -> Unit) {
     }
     CompositionLocalProvider(
         LocalNavController provides navController,
-        LocalToast provides uiActions
+        LocalToast provides uiActions,
+        LocalRippleConfiguration provides null
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             content() // 渲染主业务页面

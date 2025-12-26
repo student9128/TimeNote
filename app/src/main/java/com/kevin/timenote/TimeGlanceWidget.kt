@@ -60,6 +60,7 @@ import dagger.hilt.EntryPoints
 import java.util.Date
 import kotlin.math.abs
 import kotlin.time.ExperimentalTime
+import androidx.core.net.toUri
 
 val COUNT_KEY = intPreferencesKey("widget_count")
 
@@ -102,67 +103,86 @@ fun GlanceContent(dataList: List<CountdownModel>) {
     // 2. 布局和视图定义 (类似于 Jetpack Compose)
     Column(modifier = GlanceModifier.fillMaxSize().background(GlanceTheme.colors.background)) {
         Column(
-            modifier = GlanceModifier.fillMaxWidth().padding(10.dp)
+            modifier = GlanceModifier.fillMaxWidth()
+                .padding(horizontal = uniformPadding, vertical = 5.dp)
                 .clickable(actionStartActivity<MainActivity>())
         ) {
             Text(
                 now.formatWithPattern("yyyy年MM月dd日"),
-                style = TextStyle(color = GlanceTheme.colors.primary, fontSize = 18.sp)
+                style = TextStyle(color = GlanceTheme.colors.primary, fontSize = 16.sp)
             )
             if (jieQi.isEmpty()) {
                 Text(
-                    "农历 ${lunar.toString()} 星期${lunar.weekInChinese}",
-                    style = TextStyle(color = GlanceTheme.colors.primary, fontSize = 12.sp)
+                    "${lunar.toString()} 星期${lunar.weekInChinese}",
+                    style = TextStyle(color = GlanceTheme.colors.primary, fontSize = 10.sp)
                 )
             } else {
                 Text(
-                    "农历 ${lunar.toString()} $jieQi 星期${lunar.weekInChinese}",
-                    style = TextStyle(color = GlanceTheme.colors.primary, fontSize = 12.sp)
+                    "${lunar.toString()} $jieQi 星期${lunar.weekInChinese}",
+                    style = TextStyle(color = GlanceTheme.colors.primary, fontSize = 10.sp)
                 )
             }
         }
 
         LazyColumn(
-
+            modifier = GlanceModifier.fillMaxSize()
         ) {
             items(dataList) { model ->
                 val days = model.date.daysUntilTarget()
-                val uri = Uri.parse("timenote://detail/${model.id}")
+                val uri = "timenote://detail/${model.id}".toUri()
                 val action = actionStartActivity(
                     Intent(Intent.ACTION_VIEW, uri).apply {
                         `package` = context.packageName
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     })
                 Row(
-                    modifier = GlanceModifier.fillMaxSize().padding(
-                        vertical = 10.dp,
+                    modifier = GlanceModifier.fillMaxWidth().padding(
+                        vertical = 5.dp,
                         horizontal = uniformPadding
                     ).background(day = Color.White, night = Color.Black).clickable(action),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
-                        modifier = GlanceModifier.size(8.dp)
-                            .background(Color(model.eventTypeColor)).cornerRadius(4.dp)
+                        modifier = GlanceModifier.size(6.dp)
+                            .background(Color(model.eventTypeColor)).cornerRadius(3.dp)
                     ) { }
                     if (days > 0) {
                         Row(modifier = GlanceModifier.padding(start = 10.dp)) {
-                            Text("距离", style = TextStyle(color = GlanceTheme.colors.onSurface))
+                            Text(
+                                "距离",
+                                style = TextStyle(
+                                    color = GlanceTheme.colors.onSurface,
+                                    fontSize = 12.sp
+                                )
+                            )
                             Text(
                                 " ${model.title} ",
                                 style = TextStyle(
                                     color = GlanceTheme.colors.primary,
-                                    fontStyle = FontStyle.Italic
+                                    fontSize = 14.sp
                                 )
                             )
-                            Text("还有", style = TextStyle(color = GlanceTheme.colors.onSurface))
+                            Text(
+                                "还有",
+                                style = TextStyle(
+                                    color = GlanceTheme.colors.onSurface,
+                                    fontSize = 12.sp
+                                )
+                            )
                             Text(
                                 " $days ", style = TextStyle(
                                     color = GlanceTheme.colors.primary,
-                                    fontSize = 20.sp,
+                                    fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
-                            Text("天", style = TextStyle(color = GlanceTheme.colors.onSurface))
+                            Text(
+                                "天",
+                                style = TextStyle(
+                                    color = GlanceTheme.colors.onSurface,
+                                    fontSize = 12.sp
+                                )
+                            )
                         }
                     } else {
                         Row(modifier = GlanceModifier.padding(start = 10.dp)) {
@@ -170,21 +190,30 @@ fun GlanceContent(dataList: List<CountdownModel>) {
                                 model.title,
                                 style = TextStyle(
                                     color = GlanceTheme.colors.primary,
-                                    fontStyle = FontStyle.Italic
+                                    fontSize = 14.sp
                                 )
                             )
                             Text(
                                 " 已经过去",
-                                style = TextStyle(color = GlanceTheme.colors.onSurface)
+                                style = TextStyle(
+                                    color = GlanceTheme.colors.onSurface,
+                                    fontSize = 12.sp
+                                )
                             )
                             Text(
                                 " ${abs(days)} ", style = TextStyle(
                                     color = GlanceTheme.colors.primary,
-                                    fontSize = 20.sp,
+                                    fontSize = 16.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             )
-                            Text("天", style = TextStyle(color = GlanceTheme.colors.onSurface))
+                            Text(
+                                "天",
+                                style = TextStyle(
+                                    color = GlanceTheme.colors.onSurface,
+                                    fontSize = 12.sp
+                                )
+                            )
                         }
 
                     }
