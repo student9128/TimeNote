@@ -35,8 +35,10 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
@@ -83,6 +85,7 @@ import com.kevin.timenote.common.util.TimeL.printD
 import com.kevin.timenote.common.util.daysUntilTarget
 import com.kevin.timenote.common.util.toFriendlyString
 import com.kevin.timenote.domain.model.CountdownModel
+import com.kevin.timenote.ui.navigation.TimeRoute
 import com.kevin.timenote.ui.theme.cornerCard
 import com.kevin.timenote.ui.theme.spaceHeight10
 import com.kevin.timenote.ui.theme.spaceHeight20
@@ -119,7 +122,7 @@ fun CountdownDetailScreen(viewModel: CountdownDetailViewModel = hiltViewModel())
             }
         }
     }
-    
+
     val context = LocalContext.current
     var showPermissionDialog by remember { mutableStateOf(false) }
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -149,7 +152,8 @@ fun CountdownDetailScreen(viewModel: CountdownDetailViewModel = hiltViewModel())
                     selectedDate,
                     onDateClick = { showDatePicker = true },
                     onUpdateClick = {
-                        viewModel.save { navController.popBackStack() }
+//                        viewModel.save { navController.popBackStack() }
+                        navController.navigate(TimeRoute.Countdown(detail.id))
                     },
                     onDeleteClick = {
                         viewModel.delete { navController.popBackStack() }
@@ -168,7 +172,11 @@ fun CountdownDetailScreen(viewModel: CountdownDetailViewModel = hiltViewModel())
                     onRemindChange = { v ->
                         if (v) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                                if (ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.POST_NOTIFICATIONS
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
                                     viewModel.updateState { it.copy(remind = true) }
                                 } else {
                                     showPermissionDialog = true
@@ -205,7 +213,7 @@ fun CountdownDetailScreen(viewModel: CountdownDetailViewModel = hiltViewModel())
                     },
                 ) { DatePicker(state = datePickerState) }
             }
-            
+
             if (showPermissionDialog) {
                 AlertDialog(
                     onDismissRequest = { showPermissionDialog = false },
@@ -271,11 +279,14 @@ fun CountdownDetailContent(
 //        }
 //    }
     val days = model.date.daysUntilTarget()
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = uniformPadding),
+            .padding(horizontal = uniformPadding)
+            .verticalScroll(scrollState)
+            .padding(bottom = uniformPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top
     ) {
@@ -309,19 +320,22 @@ fun CountdownDetailContent(
                         )
                     }
 
-                    Box(  modifier = Modifier
-                        .size(100.dp)
-                        .offset(x =100.dp)
-                        .background(
-                            color = Color.Transparent,
-                            shape = RoundedCornerShape(cornerCard)
-                        ).padding(start = 10.dp),contentAlignment = Alignment.CenterStart){
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .offset(x = 100.dp)
+                            .background(
+                                color = Color.Transparent,
+                                shape = RoundedCornerShape(cornerCard)
+                            )
+                            .padding(start = 10.dp), contentAlignment = Alignment.CenterStart
+                    ) {
 
-                    Text(
-                        text = "天",
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                        Text(
+                            text = "天",
+                            fontSize = 18.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
 
@@ -336,6 +350,18 @@ fun CountdownDetailContent(
 
 
         Spacer(modifier = Modifier.height(24.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    shape = RoundedCornerShape(cornerCard)
+                )
+                .padding(uniformPadding)
+        ) {
+            Text(model.title)
+        }
+        Spacer(Modifier.height(spaceHeight10))
         Column(
             modifier = Modifier
                 .animateContentSize()
@@ -410,7 +436,7 @@ fun CountdownDetailContent(
 //        }
 
         Spacer(Modifier.height(spaceHeight10))
-        
+
         // 重复提醒设置
         Column(
             modifier = Modifier

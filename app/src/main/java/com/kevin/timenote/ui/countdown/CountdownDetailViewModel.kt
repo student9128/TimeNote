@@ -29,7 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CountdownDetailViewModel @Inject constructor(
     private val countdownUseCase: CountdownUseCase,
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CountdownEditUiState())

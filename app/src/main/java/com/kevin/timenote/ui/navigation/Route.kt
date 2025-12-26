@@ -16,7 +16,7 @@ sealed class TimeRoute {
     object Mine
 
     @Serializable
-    object Countdown
+    data class Countdown(val id: Long=0L)
 
     @Serializable
     data class CountdownDetail(val id: Long)

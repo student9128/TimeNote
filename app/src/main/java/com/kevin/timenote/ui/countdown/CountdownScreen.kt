@@ -119,7 +119,7 @@ fun CountdownScreen(
         }
     }
 
-    Scaffold(topBar = { TimeTopBar(title = "添加") }) { contentPadding ->
+    Scaffold(topBar = { TimeTopBar(title = if (!state.isEditMode)"添加" else "修改") }) { contentPadding ->
         Box(
             modifier = Modifier
                 .padding(contentPadding)

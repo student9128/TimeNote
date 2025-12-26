@@ -98,7 +98,7 @@ fun HomeScreen(
                 onSearchClick = {})
         }, floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(TimeRoute.Countdown) },
+                onClick = { navController.navigate(TimeRoute.Countdown()) },
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
