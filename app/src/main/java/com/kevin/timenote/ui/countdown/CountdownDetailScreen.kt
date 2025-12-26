@@ -390,36 +390,47 @@ fun CountdownDetailContent(
                 Text(selectedDate)
             }
 
-            HorizontalDivider()
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = uniformPadding),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("农历")
-                TimeSwitch(checked = model.isLunar, modifier = Modifier.scale(0.7f)) { v ->
-                    onUseLunarClick(v)
+            if (model.isLunar) {
+                HorizontalDivider()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = uniformPadding),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("农历日")
+                    Text(model.lunarDate)
                 }
             }
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(vertical = uniformPadding),
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Text("农历")
+//                TimeSwitch(checked = model.isLunar, modifier = Modifier.scale(0.7f)) { v ->
+//                    onUseLunarClick(v)
+//                }
+//            }
 
-            AnimatedVisibility(visible = model.isLunar) {
-                // 因为 AnimatedVisibility 内部只能有一个直接子组件（或者需要 Column 包裹），
-                // 这里我们将 Divider 和 Row 包裹在一个 Column 中
-                Column {
-                    HorizontalDivider()
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = uniformPadding),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("农历日期")
-                        Text(model.lunarDate)
-                    }
-                }
-            }
+//            AnimatedVisibility(visible = model.isLunar) {
+//                // 因为 AnimatedVisibility 内部只能有一个直接子组件（或者需要 Column 包裹），
+//                // 这里我们将 Divider 和 Row 包裹在一个 Column 中
+//                Column {
+//                    HorizontalDivider()
+//                    Row(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(vertical = uniformPadding),
+//                        horizontalArrangement = Arrangement.SpaceBetween
+//                    ) {
+//                        Text("农历日期")
+//                        Text(model.lunarDate)
+//                    }
+//                }
+//            }
         }
 //        Spacer(Modifier.height(spaceHeight10))
 //        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
@@ -435,73 +446,93 @@ fun CountdownDetailContent(
 //            }
 //        }
 
-        Spacer(Modifier.height(spaceHeight10))
-
-        // 重复提醒设置
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    MaterialTheme.colorScheme.onPrimary, shape = RoundedCornerShape(
-                        cornerCard
-                    )
-                )
-                .padding(uniformPadding)
-        ) {
-            // 提醒开关
-            Row(
+        if (model.remind) {
+            Spacer(Modifier.height(spaceHeight10))
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = uniformPadding),
+                    .background(
+                        MaterialTheme.colorScheme.onPrimary,
+                        shape = RoundedCornerShape(cornerCard)
+                    )
+                    .padding(uniformPadding)
+            ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("提醒")
-                TimeSwitch(
-                    checked = model.remind,
-                    modifier = Modifier.scale(0.7f)
-                ) { v ->
-                    onRemindChange(v)
-                }
-            }
-
-            // 只有当提醒打开时才显示重复设置
-            AnimatedVisibility(visible = model.remind) {
-                Column {
-                    HorizontalDivider()
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { repeatMenuExpanded = true }
-                            .padding(vertical = uniformPadding)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("重复提醒")
-                            Text(model.repeatMode.description)
-                        }
-
-                        DropdownMenu(
-                            expanded = repeatMenuExpanded,
-                            onDismissRequest = { repeatMenuExpanded = false }
-                        ) {
-                            com.kevin.timenote.domain.model.RepeatMode.values().forEach { mode ->
-                                DropdownMenuItem(
-                                    text = { Text(mode.description) },
-                                    onClick = {
-                                        onRepeatModeChange(mode)
-                                        repeatMenuExpanded = false
-                                    }
-                                )
-                            }
-                        }
-                    }
+                    Text("提醒")
+                    Text(model.repeatMode.description)
                 }
             }
         }
+        // 重复提醒设置
+//        Column(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .background(
+//                    MaterialTheme.colorScheme.onPrimary, shape = RoundedCornerShape(
+//                        cornerCard
+//                    )
+//                )
+//                .padding(uniformPadding)
+//        ) {
+        // 提醒开关
+
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(vertical = uniformPadding),
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Text("提醒")
+//                TimeSwitch(
+//                    checked = model.remind,
+//                    modifier = Modifier.scale(0.7f)
+//                ) { v ->
+//                    onRemindChange(v)
+//                }
+//            }
+
+        // 只有当提醒打开时才显示重复设置
+//            AnimatedVisibility(visible = model.remind) {
+//                Column {
+//                    HorizontalDivider()
+//                    Box(
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .clickable { repeatMenuExpanded = true }
+//                            .padding(vertical = uniformPadding)
+//                    ) {
+//                        Row(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.SpaceBetween,
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            Text("重复提醒")
+//                            Text(model.repeatMode.description)
+//                        }
+//
+//                        DropdownMenu(
+//                            expanded = repeatMenuExpanded,
+//                            onDismissRequest = { repeatMenuExpanded = false }
+//                        ) {
+//                            com.kevin.timenote.domain.model.RepeatMode.values().forEach { mode ->
+//                                DropdownMenuItem(
+//                                    text = { Text(mode.description) },
+//                                    onClick = {
+//                                        onRepeatModeChange(mode)
+//                                        repeatMenuExpanded = false
+//                                    }
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
 
         Spacer(Modifier.height(spaceHeight20))
         Row {

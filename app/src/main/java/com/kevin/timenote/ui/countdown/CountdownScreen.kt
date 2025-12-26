@@ -52,6 +52,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -70,9 +71,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kevin.timenote.base.LocalNavController
 import com.kevin.timenote.base.LocalToast
+import com.kevin.timenote.common.util.formatWithPattern
 import com.kevin.timenote.domain.model.RepeatMode
+import com.kevin.timenote.ui.navigation.TimeRoute
 import com.kevin.timenote.ui.theme.AppTextFieldColors
-import com.kevin.timenote.ui.theme.TimeNoteTheme
 import com.kevin.timenote.ui.theme.cornerCard
 import com.kevin.timenote.ui.theme.cornerTextField
 import com.kevin.timenote.ui.theme.spaceHeight
@@ -81,6 +83,7 @@ import com.kevin.timenote.ui.theme.spaceHeight20
 import com.kevin.timenote.ui.theme.uniformPadding
 import com.kevin.timenote.ui.widget.TimeSwitch
 import com.kevin.timenote.ui.widget.TimeTopBar
+import com.nlf.calendar.Lunar
 import com.nlf.calendar.Solar
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -92,23 +95,16 @@ fun CountdownScreen(
     viewModel: CountdownEditViewModel = hiltViewModel()
 ) {
     val navController = LocalNavController.current
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val eventTypes by viewModel.eventTypes.collectAsStateWithLifecycle()
-    var selectedEventIndex by remember { mutableStateOf(0) }
     var showDatePicker by remember { mutableStateOf(false) }
-    var useLunar by remember { mutableStateOf(false) }
     var repeatMenuExpanded by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = System.currentTimeMillis()
+        initialSelectedDateMillis = state.date
     )
-    val selectedDate = datePickerState.selectedDateMillis?.let {
-        convertMillisToDate(it)
-    } ?: ""
-    val lunarDate =
-        datePickerState.selectedDateMillis?.let { Solar.fromDate(Date(it)).lunar.toString() } ?: ""
     val isSaveEnabled = state.title.isNotBlank()
     val currentToast = LocalToast.current
-    
+
     val context = LocalContext.current
     var showPermissionDialog by remember { mutableStateOf(false) }
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -118,8 +114,13 @@ fun CountdownScreen(
             viewModel.updateState { it.copy(remind = true) }
         }
     }
+    LaunchedEffect(datePickerState.selectedDateMillis) {
+        datePickerState.selectedDateMillis?.let { date->
+            viewModel.updateState { it.copy(date = date, lunarDate = "${Lunar.fromDate(Date(date))}") }
+        }
+    }
 
-    Scaffold(topBar = { TimeTopBar(title = if (!state.isEditMode)"添加" else "修改") }) { contentPadding ->
+    Scaffold(topBar = { TimeTopBar(title = if (!state.isEditMode) "添加" else "修改") }) { contentPadding ->
         Box(
             modifier = Modifier
                 .padding(contentPadding)
@@ -133,7 +134,7 @@ fun CountdownScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     itemsIndexed(eventTypes) { index, model ->
-                        val isSelected = selectedEventIndex == index
+                        val isSelected = state.eventTypeName == model.name
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(5.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -141,7 +142,6 @@ fun CountdownScreen(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
                             ) {
-                                selectedEventIndex = index
 //                                viewModel.updateEventTypeName(model.name)
                                 viewModel.updateState {
                                     it.copy(
@@ -203,7 +203,7 @@ fun CountdownScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text("目标日")
-                        Text(selectedDate)
+                        Text(state.date.formatWithPattern("yyyy年MM月dd日"))
                     }
                     HorizontalDivider()
                     Row(
@@ -214,17 +214,16 @@ fun CountdownScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text("农历")
-                        TimeSwitch(checked = useLunar, modifier = Modifier.scale(0.7f)) { v ->
-                            useLunar = v
+                        TimeSwitch(checked = state.isLunar, modifier = Modifier.scale(0.7f)) { v ->
                             viewModel.updateState {
                                 it.copy(
                                     isLunar = v,
-                                    lunarDate = lunarDate
+                                    lunarDate = state.lunarDate
                                 )
                             }
                         }
                     }
-                    AnimatedVisibility(visible = useLunar) {
+                    AnimatedVisibility(visible = state.isLunar) {
                         // 因为 AnimatedVisibility 内部只能有一个直接子组件（或者需要 Column 包裹），
                         // 这里我们将 Divider 和 Row 包裹在一个 Column 中
                         Column {
@@ -236,7 +235,7 @@ fun CountdownScreen(
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text("农历日")
-                                Text(lunarDate)
+                                Text(state.lunarDate)
                             }
                         }
                     }
@@ -270,7 +269,11 @@ fun CountdownScreen(
                         ) { v ->
                             if (v) {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                                    if (ContextCompat.checkSelfPermission(
+                                            context,
+                                            Manifest.permission.POST_NOTIFICATIONS
+                                        ) == PackageManager.PERMISSION_GRANTED
+                                    ) {
                                         viewModel.updateState { it.copy(remind = true) }
                                     } else {
                                         showPermissionDialog = true
@@ -323,25 +326,33 @@ fun CountdownScreen(
                 }
 
                 Spacer(Modifier.height(spaceHeight20))
-                Button(modifier = Modifier.fillMaxWidth(), enabled = isSaveEnabled, onClick = {
-                    currentToast.showToast("保存成功")
-                    viewModel.save {
-                        navController.popBackStack()
-                    }
-                }) {
-                    Text("保存")
-                }
-
-                if (state.isEditMode) {
-                    Spacer(Modifier.height(8.dp))
-                    Button(
-                        onClick = {
-                            viewModel.delete {
-                                navController.popBackStack()
-                            }
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Button(modifier = Modifier.weight(1f), enabled = isSaveEnabled, onClick = {
+                        currentToast.showToast("保存成功")
+                        viewModel.save {
+                            navController.popBackStack()
                         }
-                    ) {
-                        Text("删除")
+                    }) {
+                        Text("保存")
+                    }
+
+                    if (state.isEditMode) {
+                        Spacer(Modifier.width(uniformPadding))
+                        Button(
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                viewModel.delete {
+                                    navController.popBackStack<TimeRoute.Home>(inclusive = false)
+//                                    navController.navigate(TimeRoute.Home) {
+//                                        popUpTo<TimeRoute.Home> { inclusive = false }
+//                                        launchSingleTop = true
+//                                    }
+//                                    navController.popBackStack()
+                                }
+                            }
+                        ) {
+                            Text("删除")
+                        }
                     }
                 }
             }
@@ -354,11 +365,11 @@ fun CountdownScreen(
                     confirmButton = {
                         TextButton(onClick = {
                             showDatePicker = false
-                            datePickerState.selectedDateMillis?.let { date ->
-                                viewModel.updateState {
-                                    it.copy(date = date, lunarDate = lunarDate)
-                                }
-                            }
+//                            datePickerState.selectedDateMillis?.let { date ->
+//                                viewModel.updateState {
+//                                    it.copy(date = date, lunarDate = state.lunarDate)
+//                                }
+//                            }
                         }, enabled = confirmEnabled.value) {
                             Text("确定")
                         }
@@ -368,7 +379,7 @@ fun CountdownScreen(
                     },
                 ) { DatePicker(state = datePickerState) }
             }
-            
+
             if (showPermissionDialog) {
                 AlertDialog(
                     onDismissRequest = { showPermissionDialog = false },
@@ -427,13 +438,5 @@ fun Te(v: String = "", modifier: Modifier = Modifier) {
 //            colors = AppTextFieldColors(),
 //            modifier = Modifier.fillMaxWidth()
 //        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun Test(modifier: Modifier = Modifier) {
-    TimeNoteTheme {
-        Te("nihao")
     }
 }

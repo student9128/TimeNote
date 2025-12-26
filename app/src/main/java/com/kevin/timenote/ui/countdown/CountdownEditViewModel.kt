@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.google.gson.Gson
 import com.kevin.timenote.TimeGlanceWidget
+import com.kevin.timenote.common.util.TimeL.printD
 import com.kevin.timenote.data.mapper.toEditState
 import com.kevin.timenote.domain.model.RepeatMode
 import com.kevin.timenote.domain.usecase.EventTypeUseCase
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.update
 import java.util.Date
 
@@ -56,30 +58,43 @@ class CountdownEditViewModel @Inject constructor(
     init {
         if (isEditMode) {
             viewModelScope.launch {
-                val model = countdownUseCase.getCountdownById(route.id).firstOrNull()
-                if (model != null) {
-                    _uiState.update { model.toEditState() }
-                }
+//                val model = countdownUseCase.getCountdownById(route.id).firstOrNull()
+//                if (model != null) {
+//                    _uiState.update { model.toEditState() }
+//                }
+                countdownUseCase.getCountdownById(route.id)
+                    .takeWhile { it != null }
+//                .filterNotNull()
+                    .collect { model ->
+                        // 每次数据库数据变更，这里都会收到通知
+                        if (model == null) {
+                            return@collect
+                        }
+                        printD { "isLunar===${model.isLunar},${model.lunarDate}" }
+                        _uiState.update { model.toEditState()
+                        }
+
+                    }
             }}
-            savedStateHandle.get<String>("model")?.let {
-                val model = Gson().fromJson(it, CountdownModel::class.java)
-                Log.d("Count", "title=${model.title}")
-                _uiState.value = CountdownEditUiState(
-                    id = model.id,
-                    title = model.title,
-                    location = model.location,
-                    type = model.type,
-                    startTime = model.startTime,
-                    endTime = model.endTime,
-                    date = model.date,
-                    lunarDate = model.lunarDate,
-                    isLunar = model.isLunar,
-                    eventTypeName = model.eventTypeName,
-                    eventTypeColor = model.eventTypeColor,
-                    repeatMode = model.repeatMode,
-                    remind = model.remind
-                )
-            }
+//            savedStateHandle.get<String>("model")?.let {
+//                val model = Gson().fromJson(it, CountdownModel::class.java)
+//                Log.d("Count", "title=${model.title}")
+//                _uiState.value = CountdownEditUiState(
+//                    id = model.id,
+//                    title = model.title,
+//                    location = model.location,
+//                    type = model.type,
+//                    startTime = model.startTime,
+//                    endTime = model.endTime,
+//                    date = model.date,
+//                    lunarDate = model.lunarDate,
+//                    isLunar = model.isLunar,
+//                    eventTypeName = model.eventTypeName,
+//                    eventTypeColor = model.eventTypeColor,
+//                    repeatMode = model.repeatMode,
+//                    remind = model.remind
+//                )
+//            }
             viewModelScope.launch { eventTypeUseCase.initDefaultTypes() }
 
         }

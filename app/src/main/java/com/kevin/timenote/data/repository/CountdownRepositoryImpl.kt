@@ -29,7 +29,7 @@ class CountdownRepositoryImpl @Inject constructor(private val dao: CountdownDao)
         dao.update(event.toEntity())
     }
 
-    override fun getCountdownById(id: Long): Flow<CountdownModel> {
+    override fun getCountdownById(id: Long): Flow<CountdownModel?> {
         return dao.getCountdownById(id)
     }
 

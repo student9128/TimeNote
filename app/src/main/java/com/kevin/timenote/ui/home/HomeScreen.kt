@@ -49,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.gson.Gson
 import com.kevin.timenote.ui.countdown.CountdownItem
 import com.kevin.timenote.base.LocalNavController
+import com.kevin.timenote.common.util.TimeL.printD
 import com.kevin.timenote.common.util.formatWithPattern
 import com.kevin.timenote.ui.navigation.TimeRoute
 import com.kevin.timenote.ui.theme.uniformPadding
@@ -67,7 +68,7 @@ fun HomeScreen(
     val dateJieQi by viewModel.dateJieQi.collectAsStateWithLifecycle()
     val dateSolarFestival by viewModel.dateSolarFestival.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
-    
+
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -80,7 +81,6 @@ fun HomeScreen(
         }
     }
     
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf( "今天","未来", "过去", "全部",)
 
     Scaffold(
@@ -115,13 +115,12 @@ fun HomeScreen(
                 .padding(innerPadding),
             verticalArrangement = Arrangement.Top
         ) {
-            PrimaryTabRow(selectedTabIndex = selectedTabIndex) {
+            PrimaryTabRow(selectedTabIndex = viewModel.selectTabIndex) {
                 tabs.forEachIndexed { index, title ->
                     Tab(
-                        selected = selectedTabIndex == index,
+                        selected = viewModel.selectTabIndex == index,
                         onClick = {
-                            selectedTabIndex = index
-                            viewModel.updateFilter(index)
+                            viewModel.updateTab(index)
                         },
                         text = { Text(text = title) }
                     )

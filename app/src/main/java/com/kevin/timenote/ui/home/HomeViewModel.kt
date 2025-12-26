@@ -1,5 +1,9 @@
 package com.kevin.timenote.ui.home
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kevin.timenote.domain.usecase.CountdownUseCase
@@ -35,7 +39,9 @@ class HomeViewModel @Inject constructor(
     val dateJieQi = _dateJieQi.asStateFlow()
 
     private val _filterType = MutableStateFlow(0) // 0: 今天, 1: 未来, 2: 过去, 3: 全部
-//  本地筛选
+    var selectTabIndex by mutableIntStateOf(0)//only Android Platform,if multiplatform use MutableStateFlow
+
+    //  本地筛选
 private val _allCountdowns = countdownUseCase.observeCountdowns()
     .stateIn(
         viewModelScope,
@@ -89,6 +95,10 @@ private val _allCountdowns = countdownUseCase.observeCountdowns()
             "${lunar}  星期${lunar.weekInChinese}"
         }
         _dateJieQi.update { lunar.jieQi }
+    }
+    fun updateTab(index:Int){
+        selectTabIndex = index
+        _filterType.value=index
     }
 
     fun updateFilter(index: Int) {
